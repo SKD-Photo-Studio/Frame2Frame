@@ -218,11 +218,11 @@ export interface TenantResponse {
 
 export const api = {
   dashboard: (token?: string) => fetchAPI<DashboardResponse>("/dashboard", { token }),
-  search: (q: string) => fetchAPI<SearchResponse>(`/search?q=${encodeURIComponent(q)}`),
+  search: (q: string, token?: string) => fetchAPI<SearchResponse>(`/search?q=${encodeURIComponent(q)}`, { token }),
 
   clients: {
-    list: () => fetchAPI<ClientListItem[]>("/clients"),
-    get: (id: string) => fetchAPI<ClientDetailResponse>(`/clients/${id}`),
+    list: (token?: string) => fetchAPI<ClientListItem[]>("/clients", { token }),
+    get: (id: string, token?: string) => fetchAPI<ClientDetailResponse>(`/clients/${id}`, { token }),
     create: (data: Record<string, unknown>) =>
       fetchAPI<ClientListItem>("/clients", { method: "POST", body: JSON.stringify(data) }),
     update: (id: string, data: Record<string, unknown>) =>
@@ -232,9 +232,9 @@ export const api = {
   },
 
   events: {
-    list: () => fetchAPI<EventWithFinancials[]>("/events"),
-    meta: () => fetchAPI<EventMetaResponse>("/events/meta"),
-    get: (id: string) => fetchAPI<EventDetailResponse>(`/events/${id}`),
+    list: (token?: string) => fetchAPI<EventWithFinancials[]>("/events", { token }),
+    meta: (token?: string) => fetchAPI<EventMetaResponse>("/events/meta", { token }),
+    get: (id: string, token?: string) => fetchAPI<EventDetailResponse>(`/events/${id}`, { token }),
     create: (data: Record<string, unknown>) =>
       fetchAPI<EventWithFinancials>("/events", { method: "POST", body: JSON.stringify(data) }),
     update: (id: string, data: Record<string, unknown>) =>
@@ -244,8 +244,8 @@ export const api = {
   },
 
   team: {
-    list: () => fetchAPI<TeamListItem[]>("/team"),
-    get: (id: string) => fetchAPI<TeamDetailResponse>(`/team/${id}`),
+    list: (token?: string) => fetchAPI<TeamListItem[]>("/team", { token }),
+    get: (id: string, token?: string) => fetchAPI<TeamDetailResponse>(`/team/${id}`, { token }),
     create: (data: Record<string, unknown>) =>
       fetchAPI<TeamListItem>("/team", { method: "POST", body: JSON.stringify(data) }),
     update: (id: string, data: Record<string, unknown>) =>
@@ -255,7 +255,7 @@ export const api = {
   },
 
   tenant: {
-    get: () => fetchAPI<TenantResponse>("/tenant"),
+    get: (token?: string) => fetchAPI<TenantResponse>("/tenant", { token }),
     update: (data: Partial<TenantResponse>) =>
       fetchAPI<TenantResponse>("/tenant", { method: "PUT", body: JSON.stringify(data) }),
     uploadLogo: (base64: string) =>

@@ -5,14 +5,20 @@ import { formatCurrency, getInitials, getEventTypeColor, cn } from "@/lib/utils"
 import { notFound } from "next/navigation";
 import EditClientButton from "@/components/forms/edit-client-form";
 
+import { createClient } from "@/lib/supabase.server";
+
 export default async function ClientDetailPage({
   params,
 }: {
   params: { id: string };
 }) {
+  const supabase = createClient();
+  const { data: { session } } = await supabase.auth.getSession();
+  const token = session?.access_token;
+
   let data;
   try {
-    data = await api.clients.get(params.id);
+    data = await api.clients.get(params.id, token);
   } catch {
     notFound();
   }

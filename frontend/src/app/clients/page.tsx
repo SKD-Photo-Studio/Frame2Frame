@@ -2,8 +2,14 @@ import { api } from "@/lib/api";
 import AddClientButton from "@/components/forms/add-client-form";
 import ClientsList from "./client-list";
 
+import { createClient } from "@/lib/supabase.server";
+
 export default async function ClientsPage() {
-  const clients = await api.clients.list();
+  const supabase = createClient();
+  const { data: { session } } = await supabase.auth.getSession();
+  const token = session?.access_token;
+  
+  const clients = await api.clients.list(token);
 
   return (
     <div>

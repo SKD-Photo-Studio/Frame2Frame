@@ -8,14 +8,20 @@ import { formatCurrency, getInitials, getPaidStatusColor, cn } from "@/lib/utils
 import { notFound } from "next/navigation";
 import EditTeamMemberButton from "@/components/forms/edit-team-form";
 
+import { createClient } from "@/lib/supabase.server";
+
 export default async function TeamDetailPage({
   params,
 }: {
   params: { id: string };
 }) {
+  const supabase = createClient();
+  const { data: { session } } = await supabase.auth.getSession();
+  const token = session?.access_token;
+
   let data;
   try {
-    data = await api.team.get(params.id);
+    data = await api.team.get(params.id, token);
   } catch {
     notFound();
   }
@@ -152,20 +158,6 @@ export default async function TeamDetailPage({
         </div>
       )}
 
-    </div>
-  );
-}
-
-function SummaryCard({ label, value, icon, color }: { label: string; value: string; icon: React.ReactNode; color: string }) {
-  const colors: Record<string, string> = {
-    blue: "bg-blue-50 text-blue-600", emerald: "bg-emerald-50 text-emerald-600",
-    green: "bg-green-50 text-green-600", amber: "bg-amber-50 text-amber-600",
-  };
-  return (
-    <div className="rounded-xl border border-gray-200 bg-white p-3 shadow-sm sm:p-4">
-      <div className={cn("mb-1.5 flex h-7 w-7 items-center justify-center rounded-lg sm:mb-2 sm:h-8 sm:w-8", colors[color])}>{icon}</div>
-      <p className="text-[9px] font-medium uppercase tracking-wide text-gray-400 sm:text-[10px]">{label}</p>
-      <p className="mt-0.5 text-sm font-bold text-gray-900 sm:text-lg">{value}</p>
     </div>
   );
 }

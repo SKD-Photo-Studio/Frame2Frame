@@ -2,8 +2,14 @@ import { api } from "@/lib/api";
 import AddEventButton from "@/components/forms/add-event-form";
 import EventsList from "./events-list";
 
+import { createClient } from "@/lib/supabase.server";
+
 export default async function EventsPage() {
-  const events = await api.events.list();
+  const supabase = createClient();
+  const { data: { session } } = await supabase.auth.getSession();
+  const token = session?.access_token;
+  
+  const events = await api.events.list(token);
 
   return (
     <div>

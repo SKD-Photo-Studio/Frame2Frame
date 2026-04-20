@@ -13,8 +13,14 @@ const roleColors: Record<string, string> = {
   Editor: "from-slate-400 to-gray-600",
 };
 
+import { createClient } from "@/lib/supabase.server";
+
 export default async function TeamPage() {
-  const members = await api.team.list();
+  const supabase = createClient();
+  const { data: { session } } = await supabase.auth.getSession();
+  const token = session?.access_token;
+  
+  const members = await api.team.list(token);
 
   return (
     <div>

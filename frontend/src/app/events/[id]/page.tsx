@@ -13,14 +13,20 @@ import AddPaymentButton from "@/components/forms/add-payment-form";
 import AddArtistExpenseButton from "@/components/forms/add-artist-expense-form";
 import AddOutputExpenseButton from "@/components/forms/add-output-expense-form";
 
+import { createClient } from "@/lib/supabase.server";
+
 export default async function EventDetailPage({
   params,
 }: {
   params: { id: string };
 }) {
+  const supabase = createClient();
+  const { data: { session } } = await supabase.auth.getSession();
+  const token = session?.access_token;
+
   let data;
   try {
-    data = await api.events.get(params.id);
+    data = await api.events.get(params.id, token);
   } catch {
     notFound();
   }
@@ -208,36 +214,4 @@ export default async function EventDetailPage({
 
     </div>
   );
-}
-
-function FinanceCard({ label, value, icon, color }: { label: string; value: string; icon: React.ReactNode; color: string }) {
-  const colors: Record<string, string> = {
-    blue: "bg-blue-50 text-blue-600", emerald: "bg-emerald-50 text-emerald-600",
-    amber: "bg-amber-50 text-amber-600", red: "bg-red-50 text-red-600",
-    purple: "bg-purple-50 text-purple-600", orange: "bg-orange-50 text-orange-600",
-    brand: "bg-brand-50 text-brand-600", indigo: "bg-indigo-50 text-indigo-600",
-  };
-  return (
-    <div className="rounded-xl border border-gray-200 bg-white p-3 shadow-sm sm:p-4">
-      <div className={cn("mb-1.5 flex h-7 w-7 items-center justify-center rounded-lg sm:mb-2 sm:h-8 sm:w-8", colors[color])}>{icon}</div>
-      <p className="text-[9px] font-medium uppercase tracking-wide text-gray-400 sm:text-[10px]">{label}</p>
-      <p className="mt-0.5 text-sm font-bold text-gray-900 sm:text-lg">{value}</p>
-    </div>
-  );
-}
-
-function Section({ title, count, action, children }: { title: string; count: number; action: React.ReactNode; children: React.ReactNode }) {
-  return (
-    <div className="mt-6 sm:mt-8">
-      <div className="mb-3 flex items-center justify-between sm:mb-4">
-        <h2 className="section-title">{title} <span className="ml-1 text-xs font-normal text-gray-400 sm:text-sm">({count})</span></h2>
-        {action}
-      </div>
-      {children}
-    </div>
-  );
-}
-
-function EmptyState({ text }: { text: string }) {
-  return <div className="rounded-lg border border-dashed border-gray-300 bg-white py-6 text-center text-sm text-gray-400 sm:py-8">{text}</div>;
 }
