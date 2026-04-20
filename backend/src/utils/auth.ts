@@ -9,12 +9,13 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
   }
 
   const token = authHeader.split(' ')[1];
+  console.log('[Auth] Incoming token:', token.substring(0, 10) + '...');
 
   try {
     const { data: { user }, error } = await supabase.auth.getUser(token);
 
     if (error || !user) {
-      console.error('Auth error:', error);
+      console.error('[Auth] Verification failed:', error?.message || 'No user found');
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
