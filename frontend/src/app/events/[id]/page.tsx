@@ -13,14 +13,20 @@ import AddPaymentButton from "@/components/forms/add-payment-form";
 import AddArtistExpenseButton from "@/components/forms/add-artist-expense-form";
 import AddOutputExpenseButton from "@/components/forms/add-output-expense-form";
 
+import { createClient } from "@/lib/supabase.server";
+
 export default async function EventDetailPage({
   params,
 }: {
   params: { id: string };
 }) {
+  const supabase = createClient();
+  const { data: { session } } = await supabase.auth.getSession();
+  const token = session?.access_token;
+
   let data;
   try {
-    data = await api.events.get(params.id);
+    data = await api.events.get(params.id, token);
   } catch {
     notFound();
   }

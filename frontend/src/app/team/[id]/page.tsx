@@ -8,14 +8,20 @@ import { formatCurrency, getInitials, getPaidStatusColor, cn } from "@/lib/utils
 import { notFound } from "next/navigation";
 import EditTeamMemberButton from "@/components/forms/edit-team-form";
 
+import { createClient } from "@/lib/supabase.server";
+
 export default async function TeamDetailPage({
   params,
 }: {
   params: { id: string };
 }) {
+  const supabase = createClient();
+  const { data: { session } } = await supabase.auth.getSession();
+  const token = session?.access_token;
+
   let data;
   try {
-    data = await api.team.get(params.id);
+    data = await api.team.get(params.id, token);
   } catch {
     notFound();
   }
