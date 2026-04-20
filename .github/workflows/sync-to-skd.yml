@@ -21,6 +21,12 @@ jobs:
         env:
           SKD_TOKEN: ${{ secrets.SKD_PHOTO_STUDIO_REPO_TOKEN }}
         run: |
-          git remote add skd https://github.com/SKD-Photo-Studio/Frame2Frame.git
-          git config --global url."https://x-access-token:${SKD_TOKEN}@github.com/".insteadOf "https://github.com/"
+          # 1. Remove the old remote if it exists (prevents "remote already exists" errors)
+          git remote remove skd || true
+
+          # 2. Add the remote with the token embedded in the URL
+          # Format: https://x-access-token:TOKEN@github.com/ORG/REPO.git
+          git remote add skd "https://x-access-token:${SKD_TOKEN}@github.com/SKD-Photo-Studio/Frame2Frame.git"
+
+          # 3. Explicitly push the main branch
           git push skd main --force
