@@ -6,6 +6,7 @@ import teamRoutes from "./routes/team";
 import dashboardRoutes from "./routes/dashboard";
 import searchRoutes from "./routes/search";
 import tenantRoutes from "./routes/tenant";
+import { authMiddleware } from "./utils/auth";
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -13,16 +14,19 @@ const PORT = process.env.PORT || 5001;
 app.use(cors());
 app.use(express.json());
 
+app.get("/api/health", (_req, res) => {
+  res.json({ status: "ok", timestamp: new Date().toISOString() });
+});
+
+// Protect all routes below this point
+app.use("/api", authMiddleware);
+
 app.use("/api/clients", clientRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/team", teamRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/search", searchRoutes);
 app.use("/api/tenant", tenantRoutes);
-
-app.get("/api/health", (_req, res) => {
-  res.json({ status: "ok", timestamp: new Date().toISOString() });
-});
 
 app.use(
   (
@@ -36,6 +40,10 @@ app.use(
   }
 );
 
-app.listen(PORT, () => {
-  console.log(`Backend running on http://localhost:${PORT}`);
-});
+if (process.env.NODE_ENV !== "production") {
+  app.listen(PORT, () => {
+    console.log(`Backend running on http://localhost:${PORT}`);
+  });
+}
+
+export default app;

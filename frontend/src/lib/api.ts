@@ -1,9 +1,32 @@
+import { createClient as createBrowserClient } from "./supabase.client";
+
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001/api";
 
+async function getAuthToken() {
+  // If we're on the server, we might need a different approach, 
+  // but for now, we'll focus on client-side requests which is where most 'api.' calls happen in this app.
+  if (typeof window !== 'undefined') {
+    const supabase = createBrowserClient();
+    const { data: { session } } = await supabase.auth.getSession();
+    return session?.access_token;
+  }
+  return null;
+}
+
 async function fetchAPI<T>(endpoint: string, options?: RequestInit): Promise<T> {
+  const token = await getAuthToken();
+  const headers: Record<string, string> = { 
+    "Content-Type": "application/json", 
+    ...options?.headers as Record<string, string> 
+  };
+
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
   const res = await fetch(`${API_BASE}${endpoint}`, {
     ...options,
-    headers: { "Content-Type": "application/json", ...options?.headers },
+    headers,
     cache: "no-store",
   });
   if (!res.ok) {
