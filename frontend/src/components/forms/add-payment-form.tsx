@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Plus } from "lucide-react";
 import Modal from "@/components/ui/modal";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001/api";
+import { api } from "@/lib/api";
 const INSTALLMENT_TYPES = ["Booking Amount", "Installment 1", "Installment 2", "Installment 3"];
 
 export default function AddPaymentButton({ eventId }: { eventId: string }) {
@@ -32,12 +32,7 @@ export default function AddPaymentButton({ eventId }: { eventId: string }) {
     if (!data.installment_type || !data.amount) { setError("Type and amount are required."); setLoading(false); return; }
 
     try {
-      const res = await fetch(`${API_BASE}/events/${eventId}/payments`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!res.ok) throw new Error();
+      await api.events.addPayment(eventId, data);
       router.refresh();
       setOpen(false);
     } catch {

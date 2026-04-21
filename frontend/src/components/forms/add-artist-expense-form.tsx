@@ -6,7 +6,7 @@ import { Plus } from "lucide-react";
 import Modal from "@/components/ui/modal";
 import { api, TeamListItem } from "@/lib/api";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001/api";
+
 const ROLES = ["Traditional Photographer", "Traditional Videographer", "Cinematographer", "Candid Photographer", "Assistant", "Choreographer", "Director"];
 const PAY_TYPES = ["Lump Sum", "Per Day"];
 const STATUSES = ["Unpaid", "Partial", "Paid"];
@@ -61,12 +61,7 @@ function AddArtistExpenseForm({ eventId, onSuccess }: { eventId: string; onSucce
     if (!data.user_id || !data.assignment_role) { setError("Member and role are required."); setLoading(false); return; }
 
     try {
-      const res = await fetch(`${API_BASE}/events/${eventId}/artist-expenses`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!res.ok) throw new Error();
+      await api.events.addArtistExpense(eventId, data);
       router.refresh();
       onSuccess();
     } catch {

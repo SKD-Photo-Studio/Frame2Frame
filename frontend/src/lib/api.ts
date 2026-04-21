@@ -241,6 +241,19 @@ export const api = {
       fetchAPI<EventWithFinancials>(`/events/${id}`, { method: "PUT", body: JSON.stringify(data) }),
     delete: (id: string) =>
       fetchAPI<void>(`/events/${id}`, { method: "DELETE" }),
+
+    // ── Payments & Expenses ────────────────────────────────────
+    addPayment: (eventId: string, data: Record<string, unknown>) =>
+      fetchAPI<void>(`/events/${eventId}/payments`, { method: "POST", body: JSON.stringify(data) }),
+    
+    addArtistExpense: (eventId: string, data: Record<string, unknown>) =>
+      fetchAPI<void>(`/events/${eventId}/artist-expenses`, { method: "POST", body: JSON.stringify(data) }),
+    
+    addOutputExpense: (eventId: string, data: Record<string, unknown>) =>
+      fetchAPI<void>(`/events/${eventId}/output-expenses`, { method: "POST", body: JSON.stringify(data) }),
+    
+    addDate: (eventId: string, data: { event_date: string }) =>
+      fetchAPI<void>(`/events/${eventId}/dates`, { method: "POST", body: JSON.stringify(data) }),
   },
 
   team: {

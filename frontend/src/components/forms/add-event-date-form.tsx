@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Plus } from "lucide-react";
 import Modal from "@/components/ui/modal";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001/api";
+import { api } from "@/lib/api";
 
 export default function AddEventDateButton({ eventId }: { eventId: string }) {
   const [open, setOpen] = useState(false);
@@ -23,12 +23,7 @@ export default function AddEventDateButton({ eventId }: { eventId: string }) {
     if (!event_date) { setError("Date is required."); setLoading(false); return; }
 
     try {
-      const res = await fetch(`${API_BASE}/events/${eventId}/dates`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ event_date }),
-      });
-      if (!res.ok) throw new Error();
+      await api.events.addDate(eventId, { event_date });
       router.refresh();
       setOpen(false);
     } catch {

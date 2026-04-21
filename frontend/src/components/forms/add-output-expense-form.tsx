@@ -6,7 +6,7 @@ import { Plus } from "lucide-react";
 import Modal from "@/components/ui/modal";
 import { api, TeamListItem } from "@/lib/api";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001/api";
+
 const DELIVERABLES = ["Reel", "Highlight", "Teaser", "Traditional Video", "Album", "Food & Travel", "Miscellaneous"];
 const ROLES = ["Editor", "Vendor"];
 const STATUSES = ["Unpaid", "Partial", "Paid"];
@@ -53,12 +53,7 @@ function AddOutputExpenseForm({ eventId, onSuccess }: { eventId: string; onSucce
     if (!data.user_id || !data.deliverable) { setError("Member and deliverable are required."); setLoading(false); return; }
 
     try {
-      const res = await fetch(`${API_BASE}/events/${eventId}/output-expenses`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!res.ok) throw new Error();
+      await api.events.addOutputExpense(eventId, data);
       router.refresh();
       onSuccess();
     } catch {

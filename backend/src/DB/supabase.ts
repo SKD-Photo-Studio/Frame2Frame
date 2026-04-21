@@ -31,12 +31,12 @@ export async function getDefaultTenantId(): Promise<string> {
   const { data, error } = await supabase
     .from('tenants')
     .select('id')
-    .eq('company_name', 'SKD Studios')
+    .limit(1)
     .single();
 
   if (error || !data) {
     throw new Error(
-      'SKD Studios tenant not found in DB. Run the seed script first: npx ts-node src/scripts/seed.ts'
+      'No tenant found in the database. Run the seed script first.'
     );
   }
 
