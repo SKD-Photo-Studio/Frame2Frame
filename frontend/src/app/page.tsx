@@ -35,15 +35,15 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <Link href="/clients" className="block"><StatCard label="Total Clients" value={data.total_clients.toString()} icon={<Users className="h-5 w-5" />} color="blue" /></Link>
         <Link href="/events" className="block"><StatCard label="Total Events" value={data.total_events.toString()} icon={<Calendar className="h-5 w-5" />} color="purple" /></Link>
-        <Link href="/team" className="block"><StatCard label="Team Members" value={data.total_team_members.toString()} icon={<UserCircle className="h-5 w-5" />} color="teal" /></Link>
+        <Link href="/team" className="block"><StatCard label="Team Size" value={data.total_team_members.toString()} icon={<UserCircle className="h-5 w-5" />} color="teal" /></Link>
         <StatCard label="Total Package offered" value={formatCurrency(data.total_revenue)} icon={<IndianRupee className="h-5 w-5" />} color="emerald" />
         <StatCard label="Collected from Clients" value={formatCurrency(data.total_collected)} icon={<TrendingUp className="h-5 w-5" />} color="green" />
-        <StatCard label="Pending from Clients" value={formatCurrency(data.total_pending)} icon={<Clock className="h-5 w-5" />} color="amber" />
+        <StatCard label="Client Balance" value={formatCurrency(data.total_pending)} icon={<Clock className="h-5 w-5" />} color="amber" />
         <StatCard label="Total Expenses" value={formatCurrency(data.total_expenses)} icon={<TrendingDown className="h-5 w-5" />} color="red" />
         <StatCard label="Total Artist Expenses" value={formatCurrency(data.total_artist_expenses)} icon={<TrendingDown className="h-5 w-5" />} color="orange" />
         <StatCard label="Total Output Expenses" value={formatCurrency(data.total_output_expenses)} icon={<TrendingDown className="h-5 w-5" />} color="orange" />
         <StatCard label="Paid to Team" value={formatCurrency(data.paid_to_team)} icon={<IndianRupee className="h-5 w-5" />} color="green" />
-        <StatCard label="Yet to pay to Team" value={formatCurrency(data.yet_to_pay_team)} icon={<Clock className="h-5 w-5" />} color="red" />
+        <StatCard label="Team Balance" value={formatCurrency(data.yet_to_pay_team)} icon={<Clock className="h-5 w-5" />} color="red" />
         <StatCard label="Total Savings" value={formatCurrency(data.total_savings)} icon={<TrendingUp className="h-5 w-5" />} color="brand" />
       </div>
 

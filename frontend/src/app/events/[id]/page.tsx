@@ -79,15 +79,16 @@ export default async function EventDetailPage({
       <div className="mt-4 grid grid-cols-2 gap-3 sm:mt-6 sm:gap-4 md:grid-cols-3 lg:grid-cols-3">
         <FinanceCard label="Package Value" value={formatCurrency(event.package_value)} icon={<IndianRupee className="h-4 w-4" />} color="blue" />
         <FinanceCard label="Collected from Client" value={formatCurrency(financials.total_collected)} icon={<TrendingUp className="h-4 w-4" />} color="emerald" />
-        <FinanceCard label="Pending from Client" value={formatCurrency(financials.client_balance)} icon={<Wallet className="h-4 w-4" />} color="amber" />
+        <FinanceCard label="Client Balance" value={formatCurrency(financials.client_balance)} icon={<Wallet className="h-4 w-4" />} color="amber" />
         
         <FinanceCard label="Total Expenses" value={formatCurrency(financials.total_expenses)} icon={<TrendingDown className="h-4 w-4" />} color="red" />
         <FinanceCard label="Total Artist Expenses" value={formatCurrency(financials.total_artist_expenses)} icon={<Users className="h-4 w-4" />} color="red" />
         <FinanceCard label="Total Output Expenses" value={formatCurrency(financials.total_output_expenses)} icon={<CreditCard className="h-4 w-4" />} color="red" />
 
         <FinanceCard label="Paid to Team" value={formatCurrency(financials.total_expenses_paid)} icon={<CreditCard className="h-4 w-4" />} color="purple" />
-        <FinanceCard label="Yet to Pay to Team" value={formatCurrency(financials.vendor_balance)} icon={<Wallet className="h-4 w-4" />} color="orange" />
+        <FinanceCard label="Team Balance" value={formatCurrency(financials.vendor_balance)} icon={<Wallet className="h-4 w-4" />} color="orange" />
         <FinanceCard label="Savings" value={formatCurrency(financials.savings)} icon={<TrendingUp className="h-4 w-4" />} color="brand" />
+        <FinanceCard label="Team Size" value={(artist_expenses.length + output_expenses.length).toString()} icon={<Users className="h-4 w-4" />} color="indigo" />
       </div>
 
 

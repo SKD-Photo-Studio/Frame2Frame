@@ -11,7 +11,6 @@ import { format } from "date-fns";
 import Popover from "@/components/ui/popover";
 
 const ROLES = ["Traditional Photographer", "Traditional Videographer", "Cinematographer", "Candid Photographer", "Assistant", "Choreographer", "Director"];
-const STATUSES = ["Unpaid", "Partial", "Paid"];
 
 export default function AddArtistExpenseButton({ eventId }: { eventId: string }) {
   const [open, setOpen] = useState(false);
@@ -35,6 +34,8 @@ function AddArtistExpenseForm({ eventId, onSuccess }: { eventId: string; onSucce
   const [members, setMembers] = useState<TeamListItem[]>([]);
   const [payType, setPayType] = useState<"Lump Sum" | "Per Day">("Lump Sum");
   const [selectedDates, setSelectedDates] = useState<Date[]>([]);
+  const [totalAmount, setTotalAmount] = useState(0);
+  const [advancePaid, setAdvancePaid] = useState(0);
 
   useEffect(() => { 
     api.team.list().then(setMembers).catch(() => {}); 
@@ -49,7 +50,7 @@ function AddArtistExpenseForm({ eventId, onSuccess }: { eventId: string; onSucce
 
     const fd = new FormData(e.currentTarget);
     const per_day_rate = Number(fd.get("per_day_rate")) || 0;
-    const lumpTotal = Number(fd.get("total_amount")) || 0;
+    const currentTotal = payType === "Per Day" ? noOfDays * per_day_rate : Number(fd.get("total_amount")) || 0;
 
     const data = {
       user_id: fd.get("user_id") as string,
@@ -62,9 +63,8 @@ function AddArtistExpenseForm({ eventId, onSuccess }: { eventId: string; onSucce
       date_end: selectedDates.length > 0 ? format(selectedDates.sort((a,b) => a.getTime() - b.getTime())[selectedDates.length - 1], "yyyy-MM-dd") : null,
       no_of_days: payType === "Per Day" ? noOfDays : 1,
       per_day_rate,
-      total_amount: payType === "Per Day" ? noOfDays * per_day_rate : lumpTotal,
+      total_amount: currentTotal,
       advance_paid: Number(fd.get("advance_paid")) || 0,
-      status: fd.get("status") as string,
     };
 
     if (!data.user_id || !data.assignment_role) { 
@@ -163,7 +163,14 @@ function AddArtistExpenseForm({ eventId, onSuccess }: { eventId: string; onSucce
             </div>
             <div>
               <label className="mb-1.5 block text-sm font-medium text-gray-700">Per Day Rate (₹)</label>
-              <input name="per_day_rate" type="number" min="0" placeholder="0" className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
+              <input 
+                name="per_day_rate" 
+                type="number" 
+                min="0" 
+                placeholder="0" 
+                onChange={(e) => setTotalAmount(Number(e.target.value) * noOfDays)}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" 
+              />
             </div>
           </div>
         </div>
@@ -172,20 +179,42 @@ function AddArtistExpenseForm({ eventId, onSuccess }: { eventId: string; onSucce
       {payType === "Lump Sum" && (
         <div className="animate-in fade-in slide-in-from-top-2">
           <label className="mb-1.5 block text-sm font-medium text-gray-700">Total Amount (₹)</label>
-          <input name="total_amount" type="number" min="0" placeholder="0" className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
+          <input 
+            name="total_amount" 
+            type="number" 
+            min="0" 
+            placeholder="0" 
+            onChange={(e) => setTotalAmount(Number(e.target.value))}
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" 
+          />
         </div>
       )}
 
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="mb-1.5 block text-sm font-medium text-gray-700">Advance Paid (₹)</label>
-          <input name="advance_paid" type="number" min="0" defaultValue="0" className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
+          <input 
+            name="advance_paid" 
+            type="number" 
+            min="0" 
+            defaultValue="0" 
+            onChange={(e) => setAdvancePaid(Number(e.target.value))}
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" 
+          />
         </div>
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-gray-700">Status</label>
-          <select name="status" defaultValue="Unpaid" className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500">
-            {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
-          </select>
+          <label className="mb-1.5 block text-sm font-medium text-gray-700">Payment Status</label>
+          <div className={cn(
+            "flex h-[38px] items-center rounded-lg border px-3 text-sm font-medium",
+            advancePaid > totalAmount ? "border-purple-200 bg-purple-50 text-purple-700" :
+            advancePaid === totalAmount && totalAmount > 0 ? "border-green-200 bg-green-50 text-green-700" :
+            advancePaid > 0 ? "border-amber-200 bg-amber-50 text-amber-700" :
+            "border-gray-200 bg-gray-50 text-gray-500"
+          )}>
+            {advancePaid > totalAmount ? "Overpaid" :
+             advancePaid === totalAmount && totalAmount > 0 ? "Paid" : 
+             advancePaid > 0 ? "Partial" : "Unpaid"}
+          </div>
         </div>
       </div>
 

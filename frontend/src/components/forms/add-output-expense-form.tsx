@@ -8,7 +8,6 @@ import { api, TeamListItem } from "@/lib/api";
 
 const DELIVERABLES = ["Reel", "Highlight", "Teaser", "Traditional Video", "Album", "Food & Travel", "Miscellaneous"];
 const ROLES = ["Editor", "Vendor"];
-const STATUSES = ["Unpaid", "Partial", "Paid"];
 
 export default function AddOutputExpenseButton({ eventId }: { eventId: string }) {
   const [open, setOpen] = useState(false);
@@ -31,7 +30,8 @@ function AddOutputExpenseForm({ eventId, onSuccess }: { eventId: string; onSucce
   const [error, setError] = useState("");
   const [members, setMembers] = useState<TeamListItem[]>([]);
   const [role, setRole] = useState("Editor");
-  const [status, setStatus] = useState("Unpaid");
+  const [totalAmount, setTotalAmount] = useState(0);
+  const [advancePaid, setAdvancePaid] = useState(0);
 
   useEffect(() => { 
     api.team.list()
@@ -52,7 +52,6 @@ function AddOutputExpenseForm({ eventId, onSuccess }: { eventId: string; onSucce
       quantity: Number(fd.get("quantity")) || 1,
       total_amount: Number(fd.get("total_amount")) || 0,
       advance_paid: Number(fd.get("advance_paid")) || 0,
-      status: status,
     };
 
     if (!data.user_id || !data.deliverable) { 
@@ -147,6 +146,7 @@ function AddOutputExpenseForm({ eventId, onSuccess }: { eventId: string; onSucce
             type="number" 
             min="0" 
             placeholder="0" 
+            onChange={(e) => setTotalAmount(Number(e.target.value))}
             className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/10 transition-all font-medium" 
           />
         </div>
@@ -159,30 +159,23 @@ function AddOutputExpenseForm({ eventId, onSuccess }: { eventId: string; onSucce
             type="number" 
             min="0" 
             defaultValue="0" 
+            onChange={(e) => setAdvancePaid(Number(e.target.value))}
             className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/10 transition-all" 
           />
         </div>
 
         {/* Status Toggle (Standalone on mobile or 3rd col on desktop) */}
         <div className="col-span-2 sm:col-span-1">
-          <label className="mb-2 block text-sm font-semibold text-gray-700">Status</label>
-          <div className="flex p-0.5 bg-gray-100 rounded-lg">
-            {STATUSES.map((s) => (
-              <button
-                key={s}
-                type="button"
-                onClick={() => setStatus(s)}
-                className={`flex-1 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all ${
-                  status === s
-                    ? s === "Paid" ? "bg-green-600 text-white shadow-sm" : 
-                      s === "Partial" ? "bg-amber-500 text-white shadow-sm" : 
-                      "bg-gray-600 text-white shadow-sm"
-                    : "text-gray-500 hover:text-gray-700"
-                }`}
-              >
-                {s}
-              </button>
-            ))}
+          <label className="mb-2 block text-sm font-semibold text-gray-700">Payment Status</label>
+          <div className={`flex h-[46px] items-center justify-center rounded-xl border px-4 text-[10px] font-bold uppercase tracking-wider transition-all ${
+            advancePaid > totalAmount ? "border-purple-200 bg-purple-600 text-white shadow-sm" :
+            advancePaid === totalAmount && totalAmount > 0 ? "border-green-200 bg-green-600 text-white shadow-sm" :
+            advancePaid > 0 ? "border-amber-200 bg-amber-500 text-white shadow-sm" :
+            "border-gray-200 bg-gray-600 text-white shadow-sm"
+          }`}>
+            {advancePaid > totalAmount ? "Overpaid" :
+             advancePaid === totalAmount && totalAmount > 0 ? "Paid" : 
+             advancePaid > 0 ? "Partial" : "Unpaid"}
           </div>
         </div>
       </div>

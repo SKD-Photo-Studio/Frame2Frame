@@ -144,4 +144,4 @@ export type DeliverableType =
   | "Food & Travel"
   | "Miscellaneous";
 
-export type PaidStatus = "Paid" | "Partial" | "Unpaid" | "";
+export type PaidStatus = "Paid" | "Partial" | "Unpaid" | "Overpaid" | "";

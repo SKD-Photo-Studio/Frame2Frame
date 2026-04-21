@@ -297,10 +297,13 @@ export class EventsController {
       const { id: eventId } = req.params;
       const tenantId = await getDefaultTenantId();
 
+      // Omit status from the insert as it's not a DB column
+      const { status, ...rest } = req.body;
+
       const { data, error } = await supabase
         .from("artist_expenses")
         .insert({
-          ...req.body,
+          ...rest,
           event_id: eventId,
           tenant_id: tenantId,
         })
@@ -322,10 +325,13 @@ export class EventsController {
       const { id: eventId } = req.params;
       const tenantId = await getDefaultTenantId();
 
+      // Omit status from the insert as it's not a DB column
+      const { status, ...rest } = req.body;
+
       const { data, error } = await supabase
         .from("output_expenses")
         .insert({
-          ...req.body,
+          ...rest,
           event_id: eventId,
           tenant_id: tenantId,
         })

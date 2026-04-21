@@ -128,5 +128,5 @@ export type TeamRole =
   | "Director"
   | "Editor";
 
-export type PaidStatus = "Paid" | "Partial" | "Unpaid" | "";
+export type PaidStatus = "Paid" | "Partial" | "Unpaid" | "Overpaid" | "";
 
