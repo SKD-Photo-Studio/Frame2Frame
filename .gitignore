@@ -43,6 +43,7 @@ Thumbs.db
 *.tsbuildinfo
 next-env.d.ts
 
-# Reference & Diagnostics
+# Reference and diagnostic documentation
 Vercel REST API.md
 v_*.json
+diagnostics/
