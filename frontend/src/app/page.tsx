@@ -103,12 +103,28 @@ export default async function DashboardPage() {
                   </p>
                   <p className="truncate text-xs text-gray-500">{event.venue}, {event.city}</p>
                 </div>
-                <span className={cn("hidden flex-shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium sm:inline-flex", getEventTypeColor(event.event_type))}>
-                  {event.event_type}
-                </span>
-                <span className="flex-shrink-0 text-sm font-semibold text-gray-700">
-                  {formatCurrency(event.package_value)}
-                </span>
+                <div className="hidden grid-cols-3 gap-4 text-right sm:grid md:gap-8">
+                  <div>
+                    <p className="text-[10px] font-medium uppercase text-gray-400">Package</p>
+                    <p className="text-xs font-semibold text-gray-900">{formatCurrency(event.package_value)}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-medium uppercase text-gray-400">Expenses</p>
+                    <p className="text-xs font-semibold text-red-600">{formatCurrency(event.total_expenses)}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-medium uppercase text-gray-400">Savings</p>
+                    <p className={cn("text-xs font-semibold", event.savings >= 0 ? "text-brand-600" : "text-red-600")}>
+                      {formatCurrency(event.savings)}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex-shrink-0 text-right sm:hidden">
+                  <p className="text-xs font-semibold text-gray-900">{formatCurrency(event.package_value)}</p>
+                  <p className={cn("text-[10px] font-medium", event.savings >= 0 ? "text-brand-600" : "text-red-600")}>
+                    S: {formatCurrency(event.savings)}
+                  </p>
+                </div>
               </Link>
             ))}
           </div>

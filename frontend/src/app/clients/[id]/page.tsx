@@ -112,12 +112,14 @@ export default async function ClientDetailPage({
                     <p className="text-xs font-semibold text-gray-900 sm:text-sm">{formatCurrency(event.package_value)}</p>
                   </div>
                   <div>
-                    <p className="text-[10px] font-medium uppercase text-gray-400">Collected</p>
-                    <p className="text-xs font-semibold text-emerald-600 sm:text-sm">{formatCurrency(event.total_collected)}</p>
+                    <p className="text-[10px] font-medium uppercase text-gray-400">Expenses</p>
+                    <p className="text-xs font-semibold text-red-600 sm:text-sm">{formatCurrency(event.total_expenses)}</p>
                   </div>
                   <div>
-                    <p className="text-[10px] font-medium uppercase text-gray-400">Balance</p>
-                    <p className="text-xs font-semibold text-amber-600 sm:text-sm">{formatCurrency(event.client_balance)}</p>
+                    <p className="text-[10px] font-medium uppercase text-gray-400">Savings</p>
+                    <p className={cn("text-xs font-semibold sm:text-sm", event.savings >= 0 ? "text-brand-600" : "text-red-600")}>
+                      {formatCurrency(event.savings)}
+                    </p>
                   </div>
                 </div>
               </Link>

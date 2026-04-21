@@ -43,7 +43,7 @@ function AddOutputExpenseForm({ eventId, onSuccess }: { eventId: string; onSucce
   const [totalAmount, setTotalAmount] = useState(0);
   const [advancePaid, setAdvancePaid] = useState(0);
   
-  const [role, setRole] = useState<"Editor" | "Vendor">("Editor");
+  const [role, setRole] = useState("Editor");
   const [userId, setUserId] = useState("");
   const [deliverable, setDeliverable] = useState("");
   const [showAddMember, setShowAddMember] = useState(false);
@@ -126,22 +126,20 @@ function AddOutputExpenseForm({ eventId, onSuccess }: { eventId: string; onSucce
           />
         </div>
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-gray-700">Type *</label>
-          <div className="flex p-1 bg-gray-100 rounded-lg">
-            {(["Editor", "Vendor"] as const).map((r) => (
-              <button
-                key={r}
-                type="button"
-                onClick={() => setRole(r)}
-                className={cn(
-                  "flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-all sm:text-sm",
-                  role === r ? "bg-white text-brand-600 shadow-sm" : "text-gray-500 hover:text-gray-700"
-                )}
-              >
-                {r}
-              </button>
-            ))}
-          </div>
+          <label className="mb-1.5 block text-sm font-medium text-gray-700">Role *</label>
+          <Combobox
+            value={role}
+            onChange={setRole}
+            options={[
+              { label: "Editor", value: "Editor" },
+              { label: "Vendor", value: "Vendor" },
+              { label: "Album Printer", value: "Album Printer" },
+              { label: "Logistics", value: "Logistics" },
+              { label: "Miscellaneous", value: "Miscellaneous" },
+            ]}
+            placeholder="Select or type..."
+            freeText={true}
+          />
         </div>
       </div>
 

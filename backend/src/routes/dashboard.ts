@@ -45,9 +45,23 @@ router.get('/', async (_req: Request, res: Response) => {
     const totalOutputPaid = (outputExp ?? []).reduce((s, o) => s + (o.advance_paid ?? 0), 0);
     const totalExpPaid    = totalArtistPaid + totalOutputPaid;
 
+    const artistExpByEvent: Record<string, number> = {};
+    (artistExp ?? []).forEach((a) => {
+      artistExpByEvent[a.event_id] = (artistExpByEvent[a.event_id] ?? 0) + (a.total_amount ?? 0);
+    });
+
+    const outputExpByEvent: Record<string, number> = {};
+    (outputExp ?? []).forEach((o) => {
+      outputExpByEvent[o.event_id] = (outputExpByEvent[o.event_id] ?? 0) + (o.total_amount ?? 0);
+    });
+
     // ── Recent 5 events ───────────────────────────────────────────────────────
     const recentEvents = (events ?? []).slice(0, 5).map((e) => {
       const collected = paymentsByEvent[e.id] ?? 0;
+      const artistTotal = artistExpByEvent[e.id] ?? 0;
+      const outputTotal = outputExpByEvent[e.id] ?? 0;
+      const totalExpenses = artistTotal + outputTotal;
+
       const dateString = (e.event_dates as string[] ?? [])
         .map((d) =>
           new Date(d).toLocaleDateString('en-GB', {
@@ -61,6 +75,8 @@ router.get('/', async (_req: Request, res: Response) => {
         date_string:     dateString,
         total_collected: collected,
         client_balance:  (e.package_value ?? 0) - collected,
+        total_expenses:  totalExpenses,
+        savings:         (e.package_value ?? 0) - totalExpenses,
         clients_master:  undefined,
       };
     });
