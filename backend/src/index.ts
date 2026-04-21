@@ -6,6 +6,7 @@ import teamRoutes from "./routes/team";
 import dashboardRoutes from "./routes/dashboard";
 import searchRoutes from "./routes/search";
 import tenantRoutes from "./routes/tenant";
+import bulkRoutes from "./routes/bulk";
 import { authMiddleware } from "./utils/auth";
 
 const app = express();
@@ -27,6 +28,7 @@ app.use("/api/team", teamRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/search", searchRoutes);
 app.use("/api/tenant", tenantRoutes);
+app.use("/api/bulk", bulkRoutes);
 
 app.use(
   (

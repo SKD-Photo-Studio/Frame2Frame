@@ -1,6 +1,6 @@
 import { createClient as createBrowserClient } from "./supabase.client";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001/api";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || (typeof window !== "undefined" && window.location.hostname !== "localhost" ? "/api" : "http://localhost:5001/api");
 
 async function getAuthToken() {
   if (typeof window !== 'undefined') {
@@ -276,5 +276,36 @@ export const api = {
         method: "POST",
         body: JSON.stringify({ base64 }),
       }),
+  },
+
+  bulk: {
+    getTemplate: async (token?: string) => {
+      const res = await fetch(`${API_BASE}/bulk/template`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error("Failed to download template");
+      return res.blob();
+    },
+    upload: async (file: File, token?: string) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch(`${API_BASE}/bulk/upload`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || "Failed to upload data");
+      }
+      return res.json();
+    },
+    exportAll: async (token?: string) => {
+      const res = await fetch(`${API_BASE}/bulk/export`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error("Failed to export data");
+      return res.blob();
+    },
   },
 };

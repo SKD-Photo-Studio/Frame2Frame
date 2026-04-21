@@ -26,11 +26,13 @@ export class TeamController {
           .from("artist_expenses")
           .select("user_id, total_amount, advance_paid")
           .in("user_id", userIds)
+          .eq("tenant_id", tenantId)
           .eq("is_active", true),
         supabase
           .from("output_expenses")
           .select("user_id, total_amount, advance_paid")
           .in("user_id", userIds)
+          .eq("tenant_id", tenantId)
           .eq("is_active", true),
       ]);
 
@@ -80,24 +82,38 @@ export class TeamController {
    */
   static async getById(req: Request, res: Response) {
     try {
+      const tenantId = await getDefaultTenantId();
+
+      // Verify membership first
+      const { data: membership, error: memErr } = await supabase
+        .from("workspace_memberships")
+        .select("*")
+        .eq("user_id", req.params.id)
+        .eq("tenant_id", tenantId)
+        .single();
+      
+      if (memErr || !membership) return res.status(404).json({ error: "Team member not found" });
+
       const { data: member, error: memberErr } = await supabase
         .from("users")
         .select("*")
         .eq("id", req.params.id)
         .single();
 
-      if (memberErr || !member) return res.status(404).json({ error: "Team member not found" });
+      if (memberErr || !member) return res.status(404).json({ error: "Team member details not found" });
 
       const [{ data: artistExp }, { data: outputExp }] = await Promise.all([
         supabase
           .from("artist_expenses")
           .select("*, events_master(display_id, event_type, clients_master(client_name))")
           .eq("user_id", req.params.id)
+          .eq("tenant_id", tenantId)
           .eq("is_active", true),
         supabase
           .from("output_expenses")
           .select("*, events_master(display_id, event_type, clients_master(client_name))")
           .eq("user_id", req.params.id)
+          .eq("tenant_id", tenantId)
           .eq("is_active", true),
       ]);
 
@@ -201,6 +217,18 @@ export class TeamController {
    */
   static async update(req: Request, res: Response) {
     try {
+      const tenantId = await getDefaultTenantId();
+
+      // Verify membership
+      const { data: membership } = await supabase
+        .from("workspace_memberships")
+        .select("id")
+        .eq("user_id", req.params.id)
+        .eq("tenant_id", tenantId)
+        .single();
+
+      if (!membership) return res.status(404).json({ error: "Team member not found" });
+
       const { data, error } = await supabase
         .from("users")
         .update({ ...req.body, updated_at: new Date().toISOString() })

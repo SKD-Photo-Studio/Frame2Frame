@@ -1,8 +1,8 @@
 import { api } from "@/lib/api";
 import AddClientButton from "@/components/forms/add-client-form";
 import ClientsList from "./client-list";
-
 import { createClient } from "@/lib/supabase.server";
+import BulkOperationsWrapper from "@/components/ui/bulk-operations-wrapper";
 
 export default async function ClientsPage() {
   const supabase = createClient();
@@ -20,7 +20,10 @@ export default async function ClientsPage() {
             {clients.length} clients registered
           </p>
         </div>
-        <AddClientButton />
+        <div className="flex items-center gap-3">
+          <BulkOperationsWrapper />
+          <AddClientButton />
+        </div>
       </div>
 
       <ClientsList initialClients={clients} />

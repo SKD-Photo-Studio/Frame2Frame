@@ -11,7 +11,10 @@ router.post("/", EventsController.create);
 router.put("/:id", EventsController.update);
 router.delete("/:id", EventsController.delete);
 
-// Sub-routes for Dates, Payments, and Expenses remain here for now or can be moved to controller helpers
-// For the sake of this refactor, I'll keep the sub-route logic simple or move it to the controller if needed.
+// Sub-routes for Dates, Payments, and Expenses
+router.post("/:id/payments", EventsController.addPayment);
+router.post("/:id/artist-expenses", EventsController.addArtistExpense);
+router.post("/:id/output-expenses", EventsController.addOutputExpense);
+router.post("/:id/dates", EventsController.addDate);
 
 export default router;

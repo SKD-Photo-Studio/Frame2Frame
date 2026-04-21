@@ -13,21 +13,24 @@ router.get('/', async (req: Request, res: Response) => {
     const tenantId = await getDefaultTenantId();
     const searchTerm = `%${q}%`;
 
-    // 1. Clients
+    // 1. Clients (Optimized)
     const clientsPromise = supabase
       .from('clients_master')
       .select('id, display_id, client_name, email, phone_number')
       .eq('tenant_id', tenantId)
+      .eq('is_active', true)
       .ilike('client_name', searchTerm)
       .limit(5);
 
-    // 2. Events (event_type or client_name match)
-    // To search joined table, we use Supabase's embedded filter syntax
-    // It's a bit tricky with OR across tables in PostgREST, so we'll fetch both matches
+    // 2. Events (Database-level filtering on event_type or joined client_name)
+    // Note: PostgREST 9+ supports or across joined tables with !inner
     const eventsPromise = supabase
       .from('events_master')
       .select('id, display_id, event_type, clients_master!inner(client_name)')
-      .eq('tenant_id', tenantId);
+      .eq('tenant_id', tenantId)
+      .eq('is_active', true)
+      .or(`event_type.ilike.${searchTerm},clients_master.client_name.ilike.${searchTerm}`)
+      .limit(5);
 
     // 3. Team
     const memberships = await supabase
@@ -54,15 +57,7 @@ router.get('/', async (req: Request, res: Response) => {
       teamPromise ? teamPromise : Promise.resolve({ data: [] })
     ]);
 
-    // For events, we do manual filtering if postgREST complex OR fails, 
-    // but we can just filter in memory for this limit since events aren't millions yet.
-    // However, it's better to let DB do it. Let's do memory filter for simplicity and robustness on joined OR.
-    const allEvents = eventsRes.data || [];
-    const matchedEvents = allEvents.filter(e => {
-        const cName = (e.clients_master as any)?.client_name || '';
-        return (e.event_type || '').toLowerCase().includes(q.toLowerCase()) || 
-               cName.toLowerCase().includes(q.toLowerCase());
-    }).slice(0, 5).map(e => ({
+    const formattedEvents = (eventsRes.data || []).map(e => ({
         id: e.id,
         display_id: e.display_id,
         event_type: e.event_type,
@@ -71,7 +66,7 @@ router.get('/', async (req: Request, res: Response) => {
 
     res.json({
       clients: clientsRes.data || [],
-      events: matchedEvents,
+      events: formattedEvents,
       team: teamRes?.data || []
     });
 

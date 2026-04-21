@@ -1,6 +1,8 @@
 import { api } from "@/lib/api";
 import AddTeamMemberButton from "@/components/forms/add-team-form";
 import TeamList from "./team-list";
+import { createClient } from "@/lib/supabase.server";
+import BulkOperationsWrapper from "@/components/ui/bulk-operations-wrapper";
 
 const roleColors: Record<string, string> = {
   "Traditional Photographer": "from-amber-400 to-orange-500",
@@ -12,8 +14,6 @@ const roleColors: Record<string, string> = {
   Director: "from-red-400 to-rose-500",
   Editor: "from-slate-400 to-gray-600",
 };
-
-import { createClient } from "@/lib/supabase.server";
 
 export default async function TeamPage() {
   const supabase = createClient();
@@ -29,7 +29,10 @@ export default async function TeamPage() {
           <h1 className="page-title">Team</h1>
           <p className="mt-0.5 text-sm text-gray-500">{members.length} team members</p>
         </div>
-        <AddTeamMemberButton />
+        <div className="flex items-center gap-3">
+          <BulkOperationsWrapper />
+          <AddTeamMemberButton />
+        </div>
       </div>
 
       <TeamList initialMembers={members} />

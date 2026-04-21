@@ -264,5 +264,115 @@ export class EventsController {
     }
   }
   
-  // Helper methods for sub-routes would go here too if we want full refactor
+  /**
+   * POST /:id/payments — Add payment
+   */
+  static async addPayment(req: Request, res: Response) {
+    try {
+      const { id: eventId } = req.params;
+      const tenantId = await getDefaultTenantId();
+      
+      const { data, error } = await supabase
+        .from("client_payments")
+        .insert({
+          ...req.body,
+          event_id: eventId,
+          tenant_id: tenantId,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      res.status(201).json(data);
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  }
+
+  /**
+   * POST /:id/artist-expenses — Add artist expense
+   */
+  static async addArtistExpense(req: Request, res: Response) {
+    try {
+      const { id: eventId } = req.params;
+      const tenantId = await getDefaultTenantId();
+
+      const { data, error } = await supabase
+        .from("artist_expenses")
+        .insert({
+          ...req.body,
+          event_id: eventId,
+          tenant_id: tenantId,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      res.status(201).json(data);
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  }
+
+  /**
+   * POST /:id/output-expenses — Add output expense
+   */
+  static async addOutputExpense(req: Request, res: Response) {
+    try {
+      const { id: eventId } = req.params;
+      const tenantId = await getDefaultTenantId();
+
+      const { data, error } = await supabase
+        .from("output_expenses")
+        .insert({
+          ...req.body,
+          event_id: eventId,
+          tenant_id: tenantId,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      res.status(201).json(data);
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  }
+
+  /**
+   * POST /:id/dates — Add event date
+   */
+  static async addDate(req: Request, res: Response) {
+    try {
+      const { id: eventId } = req.params;
+      const { event_date } = req.body;
+
+      if (!event_date) return res.status(400).json({ error: "Date is required" });
+
+      const tenantId = await getDefaultTenantId();
+
+      // Append to the event_dates array in events_master
+      const { data: event, error: fetchErr } = await supabase
+        .from("events_master")
+        .select("event_dates")
+        .eq("id", eventId)
+        .eq("tenant_id", tenantId)
+        .single();
+
+      if (fetchErr) throw fetchErr;
+
+      const updatedDates = [...(event.event_dates ?? []), event_date];
+
+      const { error: patchErr } = await supabase
+        .from("events_master")
+        .update({ event_dates: updatedDates, updated_at: new Date().toISOString() })
+        .eq("id", eventId)
+        .eq("tenant_id", tenantId);
+
+      if (patchErr) throw patchErr;
+      res.status(204).send();
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  }
 }

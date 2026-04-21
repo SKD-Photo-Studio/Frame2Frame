@@ -2,13 +2,15 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Plus } from "lucide-react";
+import { Plus, Calendar as CalendarIcon } from "lucide-react";
 import Modal from "@/components/ui/modal";
 import { api, TeamListItem } from "@/lib/api";
-
+import { Calendar } from "@/components/ui/date-picker";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import Popover from "@/components/ui/popover";
 
 const ROLES = ["Traditional Photographer", "Traditional Videographer", "Cinematographer", "Candid Photographer", "Assistant", "Choreographer", "Director"];
-const PAY_TYPES = ["Lump Sum", "Per Day"];
 const STATUSES = ["Unpaid", "Partial", "Paid"];
 
 export default function AddArtistExpenseButton({ eventId }: { eventId: string }) {
@@ -31,9 +33,14 @@ function AddArtistExpenseForm({ eventId, onSuccess }: { eventId: string; onSucce
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [members, setMembers] = useState<TeamListItem[]>([]);
-  const [payType, setPayType] = useState("Lump Sum");
+  const [payType, setPayType] = useState<"Lump Sum" | "Per Day">("Lump Sum");
+  const [selectedDates, setSelectedDates] = useState<Date[]>([]);
 
-  useEffect(() => { api.team.list().then(setMembers).catch(() => {}); }, []);
+  useEffect(() => { 
+    api.team.list().then(setMembers).catch(() => {}); 
+  }, []);
+
+  const noOfDays = selectedDates.length;
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -41,7 +48,6 @@ function AddArtistExpenseForm({ eventId, onSuccess }: { eventId: string; onSucce
     setError("");
 
     const fd = new FormData(e.currentTarget);
-    const no_of_days = Number(fd.get("no_of_days")) || 0;
     const per_day_rate = Number(fd.get("per_day_rate")) || 0;
     const lumpTotal = Number(fd.get("total_amount")) || 0;
 
@@ -49,16 +55,23 @@ function AddArtistExpenseForm({ eventId, onSuccess }: { eventId: string; onSucce
       user_id: fd.get("user_id") as string,
       assignment_role: fd.get("assignment_role") as string,
       pay_type: payType,
-      date_start: fd.get("date_start") as string,
-      date_end: fd.get("date_end") as string,
-      no_of_days,
+      // For backend compatibility, we can send the first and last date as range if needed,
+      // or we can extend the schema to support multiple dates. 
+      // For now, we'll store the date range and keep the multi-dates in mind for bulk export.
+      date_start: selectedDates.length > 0 ? format(selectedDates.sort((a,b) => a.getTime() - b.getTime())[0], "yyyy-MM-dd") : null,
+      date_end: selectedDates.length > 0 ? format(selectedDates.sort((a,b) => a.getTime() - b.getTime())[selectedDates.length - 1], "yyyy-MM-dd") : null,
+      no_of_days: payType === "Per Day" ? noOfDays : 1,
       per_day_rate,
-      total_amount: payType === "Per Day" ? no_of_days * per_day_rate : lumpTotal,
+      total_amount: payType === "Per Day" ? noOfDays * per_day_rate : lumpTotal,
       advance_paid: Number(fd.get("advance_paid")) || 0,
       status: fd.get("status") as string,
     };
 
-    if (!data.user_id || !data.assignment_role) { setError("Member and role are required."); setLoading(false); return; }
+    if (!data.user_id || !data.assignment_role) { 
+      setError("Member and role are required."); 
+      setLoading(false); 
+      return; 
+    }
 
     try {
       await api.events.addArtistExpense(eventId, data);
@@ -90,41 +103,74 @@ function AddArtistExpenseForm({ eventId, onSuccess }: { eventId: string; onSucce
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="mb-1.5 block text-sm font-medium text-gray-700">Start Date</label>
-          <input name="date_start" type="date" className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
-        </div>
-        <div>
-          <label className="mb-1.5 block text-sm font-medium text-gray-700">End Date</label>
-          <input name="date_end" type="date" className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
-        </div>
-      </div>
-
       <div>
         <label className="mb-1.5 block text-sm font-medium text-gray-700">Pay Type</label>
-        <div className="flex gap-4">
-          {PAY_TYPES.map((t) => (
-            <label key={t} className="flex items-center gap-2 text-sm text-gray-700">
-              <input type="radio" name="payTypeRadio" checked={payType === t} onChange={() => setPayType(t)} className="text-brand-600 focus:ring-brand-500" /> {t}
-            </label>
-          ))}
+        <div className="flex p-1 bg-gray-100 rounded-lg w-max">
+          <button
+            type="button"
+            onClick={() => setPayType("Lump Sum")}
+            className={cn(
+              "px-4 py-1.5 text-sm font-medium rounded-md transition-all",
+              payType === "Lump Sum" ? "bg-white text-brand-600 shadow-sm" : "text-gray-500 hover:text-gray-700"
+            )}
+          >
+            Lump Sum
+          </button>
+          <button
+            type="button"
+            onClick={() => setPayType("Per Day")}
+            className={cn(
+              "px-4 py-1.5 text-sm font-medium rounded-md transition-all",
+              payType === "Per Day" ? "bg-white text-brand-600 shadow-sm" : "text-gray-500 hover:text-gray-700"
+            )}
+          >
+            Per Day
+          </button>
         </div>
       </div>
 
-      {payType === "Per Day" ? (
-        <div className="grid grid-cols-2 gap-4">
+      {payType === "Per Day" && (
+        <div className="space-y-4 animate-in fade-in slide-in-from-top-2">
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-gray-700">No. of Days</label>
-            <input name="no_of_days" type="number" min="0" placeholder="0" className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
+            <label className="mb-1.5 block text-sm font-medium text-gray-700">Artist Dates</label>
+            <Popover
+              trigger={
+                <button type="button" className="flex w-full items-center gap-2 rounded-lg border border-gray-300 px-3 py-2 text-left text-sm text-gray-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500">
+                  <CalendarIcon className="h-4 w-4 text-gray-400" />
+                  {selectedDates.length > 0
+                    ? `${selectedDates.length} dates selected`
+                    : "Select dates..."}
+                </button>
+              }
+            >
+              <div className="p-1">
+                <Calendar
+                  mode="multiple"
+                  selected={selectedDates}
+                  onSelect={(dates) => setSelectedDates(dates || [])}
+                />
+              </div>
+            </Popover>
           </div>
-          <div>
-            <label className="mb-1.5 block text-sm font-medium text-gray-700">Per Day Rate (₹)</label>
-            <input name="per_day_rate" type="number" min="0" placeholder="0" className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-gray-700">No. of Days</label>
+              <div className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-900">
+                {noOfDays}
+              </div>
+              <input type="hidden" name="no_of_days" value={noOfDays} />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-gray-700">Per Day Rate (₹)</label>
+              <input name="per_day_rate" type="number" min="0" placeholder="0" className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
+            </div>
           </div>
         </div>
-      ) : (
-        <div>
+      )}
+
+      {payType === "Lump Sum" && (
+        <div className="animate-in fade-in slide-in-from-top-2">
           <label className="mb-1.5 block text-sm font-medium text-gray-700">Total Amount (₹)</label>
           <input name="total_amount" type="number" min="0" placeholder="0" className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
         </div>
