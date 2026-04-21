@@ -8,6 +8,9 @@ on:
 jobs:
   repo-sync:
     runs-on: ubuntu-latest
+    env:
+      # This squashes the Node.js 20 deprecation warnings for the actions themselves
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
       - name: Checkout
         uses: actions/checkout@v4
