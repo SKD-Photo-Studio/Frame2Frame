@@ -12,6 +12,7 @@ import Link from "next/link";
 import { api, DashboardResponse } from "@/lib/api";
 import { createClient } from "@/lib/supabase.server";
 import { formatCurrency, getEventTypeColor, cn } from "@/lib/utils";
+import { StatCard } from "@/components/ui/stat-card";
 
 export default async function DashboardPage() {
   const supabase = createClient();
@@ -114,35 +115,6 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-    </div>
-  );
-}
-
-function StatCard({ label, value, icon, color }: { label: string; value: string; icon: React.ReactNode; color: string }) {
-  const colors: Record<string, string> = {
-    blue: "bg-blue-50 text-blue-600",
-    purple: "bg-purple-50 text-purple-600",
-    teal: "bg-teal-50 text-teal-600",
-    emerald: "bg-emerald-50 text-emerald-600",
-    green: "bg-green-50 text-green-600",
-    amber: "bg-amber-50 text-amber-600",
-    red: "bg-red-50 text-red-600",
-    orange: "bg-orange-50 text-orange-600",
-    brand: "bg-brand-50 text-brand-600",
-    indigo: "bg-indigo-50 text-indigo-600",
-  };
-
-  return (
-    <div className="stat-card">
-      <div className="flex items-center gap-2.5 sm:gap-3">
-        <div className={cn("flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg sm:h-10 sm:w-10", colors[color])}>
-          {icon}
-        </div>
-        <div className="min-w-0">
-          <p className="text-[10px] font-medium uppercase tracking-wide text-gray-500 sm:text-xs">{label}</p>
-          <p className="mt-0.5 truncate text-base font-bold text-gray-900 sm:text-xl">{value}</p>
-        </div>
-      </div>
     </div>
   );
 }

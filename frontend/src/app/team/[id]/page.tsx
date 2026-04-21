@@ -5,6 +5,7 @@ import {
 } from "lucide-react";
 import { api } from "@/lib/api";
 import { formatCurrency, getInitials, getPaidStatusColor, cn } from "@/lib/utils";
+import { StatCard } from "@/components/ui/stat-card";
 import { notFound } from "next/navigation";
 import EditTeamMemberButton from "@/components/forms/edit-team-form";
 
@@ -64,10 +65,10 @@ export default async function TeamDetailPage({
 
       {/* Financial Summary */}
       <div className="mt-4 grid grid-cols-2 gap-3 sm:mt-6 sm:gap-4 md:grid-cols-4">
-        <SummaryCard label="Total Assignments" value={totals.assignments.toString()} icon={<Briefcase className="h-4 w-4" />} color="blue" />
-        <SummaryCard label="Total Earnings" value={formatCurrency(totals.earnings)} icon={<IndianRupee className="h-4 w-4" />} color="emerald" />
-        <SummaryCard label="Paid So Far" value={formatCurrency(totals.paid)} icon={<TrendingUp className="h-4 w-4" />} color="green" />
-        <SummaryCard label="Yet to Pay" value={formatCurrency(totals.balance_due)} icon={<Wallet className="h-4 w-4" />} color="amber" />
+        <StatCard label="Total Assignments" value={totals.assignments.toString()} icon={<Briefcase className="h-4 w-4" />} color="blue" />
+        <StatCard label="Total Earnings" value={formatCurrency(totals.earnings)} icon={<IndianRupee className="h-4 w-4" />} color="emerald" />
+        <StatCard label="Paid So Far" value={formatCurrency(totals.paid)} icon={<TrendingUp className="h-4 w-4" />} color="green" />
+        <StatCard label="Yet to Pay" value={formatCurrency(totals.balance_due)} icon={<Wallet className="h-4 w-4" />} color="amber" />
       </div>
 
       {/* Artist Assignments */}
@@ -158,20 +159,6 @@ export default async function TeamDetailPage({
         </div>
       )}
 
-    </div>
-  );
-}
-
-function SummaryCard({ label, value, icon, color }: { label: string; value: string; icon: React.ReactNode; color: string }) {
-  const colors: Record<string, string> = {
-    blue: "bg-blue-50 text-blue-600", emerald: "bg-emerald-50 text-emerald-600",
-    green: "bg-green-50 text-green-600", amber: "bg-amber-50 text-amber-600",
-  };
-  return (
-    <div className="rounded-xl border border-gray-200 bg-white p-3 shadow-sm sm:p-4">
-      <div className={cn("mb-1.5 flex h-7 w-7 items-center justify-center rounded-lg sm:mb-2 sm:h-8 sm:w-8", colors[color])}>{icon}</div>
-      <p className="text-[9px] font-medium uppercase tracking-wide text-gray-400 sm:text-[10px]">{label}</p>
-      <p className="mt-0.5 text-sm font-bold text-gray-900 sm:text-lg">{value}</p>
     </div>
   );
 }

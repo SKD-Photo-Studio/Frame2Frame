@@ -12,6 +12,7 @@ import AddEventDateButton from "@/components/forms/add-event-date-form";
 import AddPaymentButton from "@/components/forms/add-payment-form";
 import AddArtistExpenseButton from "@/components/forms/add-artist-expense-form";
 import AddOutputExpenseButton from "@/components/forms/add-output-expense-form";
+import { FinanceCard } from "@/components/ui/stat-card";
 
 import { createClient } from "@/lib/supabase.server";
 
@@ -212,22 +213,6 @@ export default async function EventDetailPage({
         )}
       </Section>
 
-    </div>
-  );
-}
-
-function FinanceCard({ label, value, icon, color }: { label: string; value: string; icon: React.ReactNode; color: string }) {
-  const colors: Record<string, string> = {
-    blue: "bg-blue-50 text-blue-600", emerald: "bg-emerald-50 text-emerald-600",
-    amber: "bg-amber-50 text-amber-600", red: "bg-red-50 text-red-600",
-    purple: "bg-purple-50 text-purple-600", orange: "bg-orange-50 text-orange-600",
-    brand: "bg-brand-50 text-brand-600", indigo: "bg-indigo-50 text-indigo-600",
-  };
-  return (
-    <div className="rounded-xl border border-gray-200 bg-white p-3 shadow-sm sm:p-4">
-      <div className={cn("mb-1.5 flex h-7 w-7 items-center justify-center rounded-lg sm:mb-2 sm:h-8 sm:w-8", colors[color])}>{icon}</div>
-      <p className="text-[9px] font-medium uppercase tracking-wide text-gray-400 sm:text-[10px]">{label}</p>
-      <p className="mt-0.5 text-sm font-bold text-gray-900 sm:text-lg">{value}</p>
     </div>
   );
 }
