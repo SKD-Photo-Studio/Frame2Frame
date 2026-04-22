@@ -4,6 +4,13 @@ This document tracks the most recent updates that have been pushed to the reposi
 
 ---
 
+### v2.3.3 (2026-04-22 | 01:45 PM IST)
+- **Login Experience**: Redesigned login screen with premium photography equipment background and lighter aesthetic.
+- **Branding**: Implemented public tenant info fetching so the logo appears on the login screen.
+- **Security**: Added password visibility toggle to the login form.
+- **UI State Sync**: Fixed issue where logo/admin info didn't update on login/logout (added auth state listeners).
+- **Layout Logic**: Hidden sidebar on login screen for a cleaner first impression.
+
 ### v2.3.2 (2026-04-22 | 01:30 PM IST)
 - **Management Hardening**: Created separate "Administrators" section in Settings.
 - **Team View Cleanup**: Excluded Admins from the Team view. **Only Team members are listed in team section.**
@@ -24,4 +31,4 @@ This document tracks the most recent updates that have been pushed to the reposi
 - **Versioning**: Initialized semantic versioning strategy.
 
 ---
-*Last Updated: 2026-04-22 | 01:30 PM IST*
+*Last Updated: 2026-04-22 | 01:45 PM IST*

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Sidebar from "@/components/layout/sidebar";
+import ClientShell from "@/components/layout/client-shell";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,11 +24,7 @@ export default function RootLayout({
         />
       </head>
       <body className={inter.className}>
-        <Sidebar />
-        {/* pt-14 for mobile top header, pb-20 for mobile bottom tab bar, md:ml-64 for desktop sidebar */}
-        <main className="min-h-screen pt-14 pb-20 md:ml-64 md:pt-0 md:pb-0">
-          <div className="px-4 py-4 sm:px-6 md:px-8 md:py-6">{children}</div>
-        </main>
+        <ClientShell>{children}</ClientShell>
       </body>
     </html>
   );

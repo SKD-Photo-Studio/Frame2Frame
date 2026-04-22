@@ -34,11 +34,41 @@ export default function Sidebar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [tenant, setTenant] = useState<TenantResponse | null>(null);
   const [user, setUser] = useState<any>(null);
+  const [session, setSession] = useState<any>(null);
 
   useEffect(() => {
-    api.tenant.get().then(setTenant).catch(console.error);
-    api.me().then(setUser).catch(console.error);
+    const supabase = createClient();
+    
+    // Initial fetch
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      if (session) {
+        fetchData();
+      }
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      if (session) {
+        fetchData();
+      } else {
+        setUser(null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
+
+  const fetchData = async () => {
+    try {
+      const [t, u] = await Promise.all([api.tenant.get(), api.me()]);
+      setTenant(t);
+      setUser(u);
+    } catch (err) {
+      console.error("Sidebar fetch error:", err);
+    }
+  };
 
   const handleLogout = async () => {
     if (window.confirm("Are you sure you want to logout?")) {
@@ -47,6 +77,9 @@ export default function Sidebar() {
       router.push("/login");
     }
   };
+
+  // If on login page or no session, hide sidebar
+  if (pathname === "/login" || !session) return null;
 
   useEffect(() => {
     setMobileOpen(false);
