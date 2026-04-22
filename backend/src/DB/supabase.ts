@@ -22,7 +22,7 @@ export const supabase = createClient(supabaseUrl, supabaseKey, {
 });
 
 // ── Default Tenant Helper ────────────────────────────────────────────────────
-// MVP: single-tenant (SKD Studios). Cached after first call.
+// MVP: single-tenant (SKD Photo Studio). Cached after first call.
 let _cachedTenantId: string | null = null;
 
 export async function getDefaultTenantId(): Promise<string> {

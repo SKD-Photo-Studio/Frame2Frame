@@ -1,5 +1,5 @@
 /**
- * Seed Script: SKD Studios — Frame2Frame
+ * Seed Script: SKD Photo Studio — Frame2Frame
  *
  * Run from the backend/ directory:
  *   npx ts-node src/scripts/seed.ts
@@ -38,11 +38,11 @@ async function seed() {
   const { data: existingTenant } = await supabase
     .from('tenants')
     .select('id')
-    .eq('company_name', 'SKD Studios')
+    .eq('company_name', 'SKD Photo Studio')
     .maybeSingle();
 
   if (existingTenant) {
-    console.log('⚠️  SKD Studios tenant already exists. Seed skipped.');
+    console.log('⚠️  SKD Photo Studio tenant already exists. Seed skipped.');
     console.log(`   Tenant ID: ${existingTenant.id}`);
     return;
   }
@@ -51,7 +51,7 @@ async function seed() {
   console.log('1️⃣  Inserting tenant...');
   const { data: tenantRows, error: tenantErr } = await supabase
     .from('tenants')
-    .insert({ display_id: 'SKD-001', company_name: 'SKD Studios' })
+    .insert({ display_id: 'SKD-001', company_name: 'SKD Photo Studio' })
     .select();
 
   if (tenantErr || !tenantRows?.length) {

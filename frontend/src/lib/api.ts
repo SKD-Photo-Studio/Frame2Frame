@@ -224,6 +224,7 @@ export interface TenantResponse {
 
 export const api = {
   dashboard: (token?: string) => fetchAPI<DashboardResponse>("/dashboard", { token }),
+  me: (token?: string) => fetchAPI<any>("/me", { token }),
   search: (q: string, token?: string) => fetchAPI<SearchResponse>(`/search?q=${encodeURIComponent(q)}`, { token }),
 
   clients: {
@@ -275,6 +276,7 @@ export const api = {
 
   tenant: {
     get: (token?: string) => fetchAPI<TenantResponse>("/tenant", { token }),
+    listAdmins: (token?: string) => fetchAPI<any[]>("/tenant/admins", { token }),
     update: (data: Partial<TenantResponse>) =>
       fetchAPI<TenantResponse>("/tenant", { method: "PUT", body: JSON.stringify(data) }),
     uploadLogo: (base64: string) =>

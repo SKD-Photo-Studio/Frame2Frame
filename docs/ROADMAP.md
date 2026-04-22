@@ -19,4 +19,4 @@ These features and improvements are planned for future versions of Frame2Frame b
 - **Client Portal**: Allow clients to log in and see their booking status and payment history.
 
 ---
-*Last Updated: 2026-04-22*
+*Last Updated: 2026-04-22 | 12:34 PM IST*

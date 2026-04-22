@@ -1,25 +1,29 @@
-# Pending Deployment
+# Deployment Status (Production)
 
-This document tracks features and fixes that have been implemented locally and pushed to the `main` branch, but may not yet be reflected in the live Vercel environment.
+This document tracks the synchronization status between the local development environment and the production Vercel deployment.
 
 ---
 
-## Current Status: 🟢 All Synced
-As of the latest push to the `main` branch, all local improvements have been synchronized with the origin repository.
+## Current Live Version: `v2.3.2`
+## Local Development Status: ✅ Synchronized with Live
 
-### Recent Pushes (Awaiting Vercel Build)
-- **Hardened Security**: Removal of development bypass logic.
-- **Documentation Restructure**: Migration to the new 5-doc system.
-- **Financial Logic Fixes**: Rounding and column alignment in exports.
-- **Frontend Fix**: Resolved build error in Client Detail page (`getPaidStatusColor` import).
+### 📝 Recently Pushed (v2.3.1 & v2.3.2)
+- [x] **Bulk Operations**: Added "Download Report" and "Bulk Upload" to Dashboard.
+- [x] **Branding Hardening**: Global rename to "SKD Photo Studio".
+- [x] **Management Separation**: Excluded Admins from Team view (Only Team members listed).
+- [x] **Admin Management**: Created a separate "Administrators" section in Settings.
+- [x] **Personalization**: Dynamic sidebar profile names/emails via `/api/me`.
+- [x] **Safety**: Added logout confirmation dialog.
+
+---
 
 ## How to Deploy
 1. Ensure all local changes are committed and pushed:
-   ```bash
-   git push origin main
-   ```
-2. Check your [Vercel Dashboard](https://vercel.com/skdhananjaygits-projects) for the latest deployment status.
+   `git add .`
+   `git commit -m "Release v2.3.2: Management hardening and branding finalization"`
+   `git push origin main`
+2. Vercel will automatically trigger a build if the GitHub hook is active.
 3. If automatic deployments are disabled, trigger a manual deployment from the `main` branch.
 
 ---
-*Last Updated: 2026-04-22*
+*Last Updated: 2026-04-22 | 01:30 PM IST*

@@ -11,11 +11,14 @@ import {
   BookOpen,
   Menu,
   X,
+  LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { api, TenantResponse } from "@/lib/api";
 import GlobalSearch from "./global-search";
+import { createClient } from "@/lib/supabase.client";
+import { useRouter } from "next/navigation";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
@@ -27,12 +30,23 @@ const navigation = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [tenant, setTenant] = useState<TenantResponse | null>(null);
+  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
     api.tenant.get().then(setTenant).catch(console.error);
+    api.me().then(setUser).catch(console.error);
   }, []);
+
+  const handleLogout = async () => {
+    if (window.confirm("Are you sure you want to logout?")) {
+      const supabase = createClient();
+      await supabase.auth.signOut();
+      router.push("/login");
+    }
+  };
 
   useEffect(() => {
     setMobileOpen(false);
@@ -124,17 +138,24 @@ export default function Sidebar() {
             </nav>
             <div className="border-t border-white/10 p-4">
               <div className="flex items-center gap-3">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-sidebar-active text-xs font-semibold text-white">
-                  A
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-sidebar-active text-xs font-semibold text-white uppercase">
+                  {user?.full_name?.charAt(0) || "A"}
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium text-white">
-                    Admin
+                    {user?.full_name || "Admin"}
                   </p>
                   <p className="truncate text-xs text-sidebar-text">
-                    admin@skd.com
+                    {user?.email || "admin@skd.com"}
                   </p>
                 </div>
+                <button 
+                  onClick={handleLogout}
+                  className="p-1.5 text-sidebar-text hover:text-white transition-colors"
+                  title="Logout"
+                >
+                  <LogOut className="h-4 w-4" />
+                </button>
               </div>
             </div>
           </aside>
@@ -182,7 +203,7 @@ export default function Sidebar() {
           )}
           <div className="min-w-0 flex-1">
             <h1 className="truncate text-xs font-bold text-white uppercase tracking-wider">
-              {tenant?.company_name || "SKD Studios"}
+              {tenant?.company_name || "SKD Photo Studio"}
             </h1>
             <Link href="/" className="mt-0.5 flex items-center gap-2 group transition-opacity hover:opacity-80">
               <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded bg-brand-600">
@@ -223,15 +244,22 @@ export default function Sidebar() {
 
         <div className="border-t border-white/10 p-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-sidebar-active text-sm font-semibold text-white">
-              A
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-sidebar-active text-sm font-semibold text-white uppercase">
+              {user?.full_name?.charAt(0) || "A"}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium text-white">Admin</p>
-              <p className="truncate text-xs text-sidebar-text">
-                admin@skd.com
+              <p className="truncate text-sm font-medium text-white">{user?.full_name || "Admin"}</p>
+              <p className="truncate text-[10px] text-sidebar-text">
+                {user?.email || "admin@skd.com"}
               </p>
             </div>
+            <button 
+              onClick={handleLogout}
+              className="p-2 text-sidebar-text hover:text-white transition-colors rounded-lg hover:bg-sidebar-hover"
+              title="Logout"
+            >
+              <LogOut className="h-5 w-5" />
+            </button>
           </div>
         </div>
       </aside>

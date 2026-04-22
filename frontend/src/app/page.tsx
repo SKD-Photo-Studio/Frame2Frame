@@ -13,6 +13,7 @@ import { api, DashboardResponse } from "@/lib/api";
 import { createClient } from "@/lib/supabase.server";
 import { formatCurrency, getEventTypeColor, cn } from "@/lib/utils";
 import { StatCard } from "@/components/ui/stat-card";
+import BulkOperationsWrapper from "@/components/ui/bulk-operations-wrapper";
 
 export default async function DashboardPage() {
   const supabase = createClient();
@@ -23,13 +24,14 @@ export default async function DashboardPage() {
 
   return (
     <div>
-      <div className="page-header">
+      <div className="page-header flex items-center justify-between">
         <div>
           <h1 className="page-title">Dashboard</h1>
           <p className="mt-0.5 text-sm text-gray-500">
             Overview of your business at a glance
           </p>
         </div>
+        <BulkOperationsWrapper />
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">

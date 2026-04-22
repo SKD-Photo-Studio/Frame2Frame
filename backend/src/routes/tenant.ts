@@ -24,6 +24,34 @@ router.get("/", async (_req: Request, res: Response) => {
 });
 
 /**
+ * GET /admins — List all admins for the current tenant
+ */
+router.get("/admins", async (_req: Request, res: Response) => {
+  try {
+    const tenantId = await getDefaultTenantId();
+
+    const { data, error } = await supabase
+      .from("workspace_memberships")
+      .select("role, users(*)")
+      .eq("tenant_id", tenantId)
+      .eq("role", "ADMIN")
+      .eq("is_active", true);
+
+    if (error) throw error;
+    
+    // Flatten the response
+    const admins = data.map((m: any) => ({
+      ...m.users,
+      role: m.role
+    }));
+
+    res.json(admins);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
  * PUT / — Update current tenant info
  */
 router.put("/", async (req: Request, res: Response) => {

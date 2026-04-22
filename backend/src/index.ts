@@ -7,6 +7,7 @@ import dashboardRoutes from "./routes/dashboard";
 import searchRoutes from "./routes/search";
 import tenantRoutes from "./routes/tenant";
 import bulkRoutes from "./routes/bulk";
+import meRoutes from "./routes/me";
 import { authMiddleware } from "./utils/auth";
 
 const app = express();
@@ -22,6 +23,7 @@ app.get("/api/health", (_req, res) => {
 // Protect all routes below this point
 app.use("/api", authMiddleware);
 
+app.use("/api/me", meRoutes);
 app.use("/api/clients", clientRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/team", teamRoutes);

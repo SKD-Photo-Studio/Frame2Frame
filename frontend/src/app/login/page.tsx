@@ -117,7 +117,7 @@ function LoginFormContent() {
 
         {/* Footer */}
         <p className="text-center mt-8 text-gray-500 text-sm">
-          Protected by SKD Photo Studio
+          Made for SKD Photo Studio
         </p>
       </div>
 

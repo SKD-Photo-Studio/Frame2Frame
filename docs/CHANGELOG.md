@@ -4,19 +4,24 @@ This document tracks the most recent updates that have been pushed to the reposi
 
 ---
 
-## [v2.3.0] - 2026-04-22 (Current Push)
-### 🛡️ Hardening & Security
-- **Auth Lockdown**: Stripped all local development authentication bypass code from the production logic.
-- **Middleware Cleanup**: Unified Supabase auth enforcement across both frontend and backend.
+### v2.3.2 (2026-04-22 | 01:30 PM IST)
+- **Management Hardening**: Created separate "Administrators" section in Settings.
+- **Team View Cleanup**: Excluded Admins from the Team view. **Only Team members are listed in team section.**
+- **Personalization**: Implemented `/api/me` for dynamic profile names/emails in Sidebar.
+- **Safety**: Added logout confirmation dialog ("Are you sure you want to logout?").
+- **Data Integrity**: Updated Admin profiles (Ashwyn Mangalampalli & SKD Photo Studio).
 
-### 📈 Financial & Data Accuracy
-- **Excel Export Fix**: Resolved the column alignment issue in Artist Expense exports by properly handling date columns.
-- **Rounding Logic**: Standardized all balance calculations to 2 decimal places to prevent penny discrepancies.
-- **Usual Role Auto-fill**: Implemented intelligent auto-fill for artist and output expenses based on team member preferences.
-
-### 🧹 Maintenance & Organization
-- **Doc Restructure**: Reorganized documentation into a 5-file system (History, Architecture, Pending, Roadmap, Changelog).
-- **Bulk Hardening**: Implemented case-insensitive lookups and automatic workspace membership for bulk uploads.
+### v2.3.1 (2026-04-22 | 01:30 PM IST)
+- **Bulk Operations**: Added "Download Report" and "Bulk Upload" to Dashboard Header.
+- **Branding**: Global rename of "SKD Studios" to "SKD Photo Studio".
+- **Login UI**: Updated footer to "Made for SKD Photo Studio".
 
 ---
-*Last Updated: 2026-04-22*
+
+## [v2.3.0] - 2026-04-22 | 12:41 PM IST
+- **Production Build**: First stable production push to Vercel.
+- **Architecture**: Purged all `DEV_BYPASS` logic for security.
+- **Versioning**: Initialized semantic versioning strategy.
+
+---
+*Last Updated: 2026-04-22 | 01:30 PM IST*
