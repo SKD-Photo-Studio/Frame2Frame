@@ -1,3 +1,5 @@
+'use client'
+
 import { useState, Suspense, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase.client'
@@ -61,24 +63,40 @@ function LoginFormContent() {
       {/* Decorative Gradient Overlay */}
       <div className="absolute inset-0 z-1 bg-gradient-to-tr from-white/60 via-transparent to-white/40 pointer-events-none" />
 
-      <div className="w-full max-w-md relative z-10">
-        {/* Logo/Brand Section */}
+      <div className="w-full max-w-md relative z-10 font-[family-name:var(--font-outfit)]">
+        {/* New Header Hierarchy */}
         <div className="text-center mb-8 animate-fade-in">
-          {tenant?.logo_url ? (
-            <img 
-              src={tenant.logo_url} 
-              alt={tenant.company_name} 
-              className="h-20 w-auto mx-auto mb-4 object-contain filter drop-shadow-md"
-            />
-          ) : (
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-black mb-6 shadow-xl">
-              <LogIn className="w-8 h-8 text-white" />
+          {/* Double Frame Icon */}
+          <div className="flex justify-center mb-4">
+            <div className="relative w-10 h-10">
+              <div className="absolute top-0 right-0 w-7 h-7 border-2 border-gray-900 rounded-lg bg-white/50" />
+              <div className="absolute bottom-0 left-0 w-7 h-7 border-2 border-gray-900 rounded-lg bg-white shadow-sm" />
             </div>
-          )}
-          <h1 className="text-3xl font-bold text-gray-900 tracking-tight mb-1">
-            {tenant?.company_name || 'SKD Photo Studio'}
+          </div>
+
+          <h1 className="text-5xl font-extrabold text-gray-900 tracking-tight mb-2">
+            Frame2Frame
           </h1>
-          <p className="text-gray-600 font-medium">Internal Production Portal</p>
+          <p className="text-gray-500 text-sm font-bold uppercase tracking-[0.4em] mb-8">
+            Internal Portal
+          </p>
+
+          <div className="flex flex-col items-center gap-3 mb-8">
+            <div className="h-px w-16 bg-gray-200" />
+            <div className="flex items-center gap-4">
+              {tenant?.logo_url && (
+                <img 
+                  src={tenant.logo_url} 
+                  alt="" 
+                  className="h-12 w-auto object-contain"
+                />
+              )}
+              <h2 className="text-lg font-medium text-gray-700">
+                Made for <span className="text-black font-bold">{tenant?.company_name || 'SKD Photo Studio'}</span>
+              </h2>
+            </div>
+            <div className="h-px w-16 bg-gray-200" />
+          </div>
         </div>
 
         {/* Login Card */}
@@ -107,7 +125,7 @@ function LoginFormContent() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full pl-11 pr-4 py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all font-medium"
-                  placeholder="name@skdstudios.in"
+                  placeholder="admin@skdphotostudio.in"
                 />
               </div>
             </div>
@@ -153,14 +171,6 @@ function LoginFormContent() {
               )}
             </button>
           </form>
-        </div>
-
-        {/* Footer */}
-        <div className="text-center mt-10">
-          <p className="text-gray-500 text-sm font-medium">
-            Made for <span className="text-gray-900 font-bold">SKD Photo Studio</span>
-          </p>
-          <p className="text-gray-400 text-xs mt-1">© 2026 Frame2Frame Management Suite</p>
         </div>
       </div>
 

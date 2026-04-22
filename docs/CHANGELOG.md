@@ -4,7 +4,12 @@ This document tracks the most recent updates that have been pushed to the reposi
 
 ---
 
-### v2.3.3 (2026-04-22 | 01:45 PM IST)
+### v2.3.4 (2026-04-22 | 02:25 PM IST)
+- **Production Push**: Finalized premium UI and branding for live environment.
+- **UI Branding**: Redesigned Frame2Frame title with "Outfit" font and custom frame icon.
+- **UI Improvements**: Reorganized login hierarchy and updated SKD logo scaling.
+- **Branding Consistency**: Renamed "Tenant Logo" to "Company Logo" in Settings.
+- **Stability**: Fixed hydration errors and conditional hook issues in Sidebar/ClientShell.
 - **Login Experience**: Redesigned login screen with premium photography equipment background and lighter aesthetic.
 - **Branding**: Implemented public tenant info fetching so the logo appears on the login screen.
 - **Security**: Added password visibility toggle to the login form.
@@ -13,22 +18,14 @@ This document tracks the most recent updates that have been pushed to the reposi
 
 ### v2.3.2 (2026-04-22 | 01:30 PM IST)
 - **Management Hardening**: Created separate "Administrators" section in Settings.
-- **Team View Cleanup**: Excluded Admins from the Team view. **Only Team members are listed in team section.**
+- **Team View Cleanup**: Excluded Admins from the Team view.
 - **Personalization**: Implemented `/api/me` for dynamic profile names/emails in Sidebar.
-- **Safety**: Added logout confirmation dialog ("Are you sure you want to logout?").
-- **Data Integrity**: Updated Admin profiles (Ashwyn Mangalampalli & SKD Photo Studio).
-
-### v2.3.1 (2026-04-22 | 01:30 PM IST)
-- **Bulk Operations**: Added "Download Report" and "Bulk Upload" to Dashboard Header.
-- **Branding**: Global rename of "SKD Studios" to "SKD Photo Studio".
-- **Login UI**: Updated footer to "Made for SKD Photo Studio".
+- **Safety**: Added logout confirmation dialog.
 
 ---
 
-## [v2.3.0] - 2026-04-22 | 12:41 PM IST
-- **Production Build**: First stable production push to Vercel.
-- **Architecture**: Purged all `DEV_BYPASS` logic for security.
-- **Versioning**: Initialized semantic versioning strategy.
-
----
-*Last Updated: 2026-04-22 | 01:45 PM IST*
+## Versioning Rules
+- **X.0.0.0**: Total Overhaul (e.g. v3.0.0.0)
+- **0.X.0.0**: Major Changes (e.g. v2.4.0.0)
+- **0.0.X.0**: Production/Live Push (e.g. v2.3.4.0)
+- **0.0.0.X**: Local Refinements/Builds (e.g. v2.3.3.1)

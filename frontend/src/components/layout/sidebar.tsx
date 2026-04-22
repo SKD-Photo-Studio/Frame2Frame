@@ -78,9 +78,6 @@ export default function Sidebar() {
     }
   };
 
-  // If on login page or no session, hide sidebar
-  if (pathname === "/login" || !session) return null;
-
   useEffect(() => {
     setMobileOpen(false);
   }, [pathname]);
@@ -95,6 +92,9 @@ export default function Sidebar() {
       document.body.style.overflow = "";
     };
   }, [mobileOpen]);
+
+  // If on login page or no session, hide sidebar
+  if (pathname === "/login" || !session) return null;
 
   return (
     <>
@@ -143,7 +143,7 @@ export default function Sidebar() {
               </div>
               <div>
                 <h1 className="text-sm font-bold text-white">Frame2Frame</h1>
-                <p className="text-[10px] text-sidebar-text">v2.0</p>
+                <p className="text-[10px] text-sidebar-text">v2.3.4</p>
               </div>
             </div>
             <nav className="flex-1 space-y-1 px-3 py-4">

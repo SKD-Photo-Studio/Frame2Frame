@@ -79,7 +79,7 @@ export default function LogoUpload({ currentLogoUrl, onUploadComplete }: LogoUpl
           )}
         </div>
         <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-700">Tenant Logo</label>
+          <label className="block text-sm font-medium text-gray-700">Company Logo</label>
           <p className="text-xs text-gray-500 mb-2">Max 100KB, 500x500px (Auto-compressed)</p>
           <input
             type="file"

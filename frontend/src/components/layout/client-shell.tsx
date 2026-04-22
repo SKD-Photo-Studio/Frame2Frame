@@ -8,9 +8,11 @@ import Sidebar from '@/components/layout/sidebar'
 export default function ClientShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const [session, setSession] = useState<any>(null)
+  const [mounted, setMounted] = useState(false)
   const isLoginPage = pathname === '/login'
 
   useEffect(() => {
+    setMounted(true)
     const supabase = createClient()
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
@@ -24,7 +26,7 @@ export default function ClientShell({ children }: { children: React.ReactNode })
   }, [])
 
   // If on login page or not logged in, don't show sidebar and remove main margin/padding
-  const showSidebar = !isLoginPage && !!session
+  const showSidebar = mounted && !isLoginPage && !!session
 
   return (
     <>
