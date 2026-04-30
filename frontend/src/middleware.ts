@@ -1,7 +1,7 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-export async function middleware(request: NextRequest) {
+export default async function middleware(request: NextRequest) {
   let response = NextResponse.next({
     request: {
       headers: request.headers,
@@ -35,14 +35,29 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
+  // Maintenance Mode Check
+  const isMaintenancePage = request.nextUrl.pathname === '/maintenance'
+  const isPublicAsset = request.nextUrl.pathname.match(/\.(.*)$/) || request.nextUrl.pathname.startsWith('/_next')
+  
+  const isLiveMaintenance = process.env.NEXT_PUBLIC_MAINTENANCE_MODE === 'true'
+  const isLocalMaintenance = process.env.NEXT_PUBLIC_LOCAL_MAINTENANCE_MODE === 'true'
+  const isLocal = process.env.NODE_ENV === 'development'
+  
+  const activeMaintenance = isLocal ? isLocalMaintenance : isLiveMaintenance
+
+  if (activeMaintenance && !isMaintenancePage && !isPublicAsset) {
+    return NextResponse.redirect(new URL('/maintenance', request.url))
+  }
+
   // Protect internal routes
   const isLoginPage = request.nextUrl.pathname === '/login'
-  const isAuthRoute = request.nextUrl.pathname.startsWith('/api/auth') // If we add any auth-related API routes later
-  const isPublicAsset = request.nextUrl.pathname.match(/\.(.*)$/) || request.nextUrl.pathname.startsWith('/_next')
+  const isAuthRoute = request.nextUrl.pathname.startsWith('/api/auth') 
+  const isPublicApi = request.nextUrl.pathname === '/api/tenant' || request.nextUrl.pathname === '/api/tenant/logo'
 
-
-  if (!user && !isLoginPage && !isAuthRoute && !isPublicAsset) {
-    // No user, potentially redirect to login page
+  if (!user && !isLoginPage && !isAuthRoute && !isPublicApi && !isPublicAsset) {
+    if (request.nextUrl.pathname.startsWith('/api')) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     url.searchParams.set('returnTo', request.nextUrl.pathname)

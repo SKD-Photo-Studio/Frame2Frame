@@ -109,7 +109,7 @@ function AddArtistExpenseForm({ eventId, onSuccess }: { eventId: string; onSucce
       <div className="grid grid-cols-2 gap-4">
         <div>
           <div className="mb-1.5 flex items-center justify-between">
-            <label className="block text-sm font-medium text-gray-700">Team Member *</label>
+            <label className="form-label !mb-0">Team Member *</label>
             <button
               type="button"
               onClick={() => setShowAddMember(true)}
@@ -133,7 +133,7 @@ function AddArtistExpenseForm({ eventId, onSuccess }: { eventId: string; onSucce
           />
         </div>
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-gray-700">Role *</label>
+          <label className="form-label">Role *</label>
           <Combobox
             value={role}
             onChange={setRole}
@@ -145,14 +145,13 @@ function AddArtistExpenseForm({ eventId, onSuccess }: { eventId: string; onSucce
       </div>
 
       <div>
-        <label className="mb-1.5 block text-sm font-medium text-gray-700">Pay Type</label>
-        <div className="flex p-1 bg-gray-100 rounded-lg w-max">
+        <div className="flex p-1 bg-gray-100 dark:bg-gray-800 rounded-lg w-max">
           <button
             type="button"
             onClick={() => setPayType("Lump Sum")}
             className={cn(
               "px-4 py-1.5 text-sm font-medium rounded-md transition-all",
-              payType === "Lump Sum" ? "bg-white text-brand-600 shadow-sm" : "text-gray-500 hover:text-gray-700"
+              payType === "Lump Sum" ? "bg-white dark:bg-gray-700 text-brand-600 dark:text-brand-400 shadow-sm" : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
             )}
           >
             Lump Sum
@@ -162,7 +161,7 @@ function AddArtistExpenseForm({ eventId, onSuccess }: { eventId: string; onSucce
             onClick={() => setPayType("Per Day")}
             className={cn(
               "px-4 py-1.5 text-sm font-medium rounded-md transition-all",
-              payType === "Per Day" ? "bg-white text-brand-600 shadow-sm" : "text-gray-500 hover:text-gray-700"
+              payType === "Per Day" ? "bg-white dark:bg-gray-700 text-brand-600 dark:text-brand-400 shadow-sm" : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
             )}
           >
             Per Day
@@ -173,10 +172,10 @@ function AddArtistExpenseForm({ eventId, onSuccess }: { eventId: string; onSucce
       {payType === "Per Day" && (
         <div className="space-y-4 animate-in fade-in slide-in-from-top-2">
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-gray-700">Artist Dates</label>
+            <label className="form-label">Artist Dates</label>
             <Popover
               trigger={
-                <button type="button" className="flex w-full items-center gap-2 rounded-lg border border-gray-300 px-3 py-2 text-left text-sm text-gray-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500">
+                <button type="button" className="flex w-full items-center gap-2 rounded-xl border border-gray-300 dark:border-gray-800 bg-white dark:bg-[#1a1a1a] px-3 py-2 text-left text-sm text-gray-900 dark:text-white focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 transition-all">
                   <CalendarIcon className="h-4 w-4 text-gray-400" />
                   {selectedDates.length > 0
                     ? `${selectedDates.length} dates selected`
@@ -196,21 +195,21 @@ function AddArtistExpenseForm({ eventId, onSuccess }: { eventId: string; onSucce
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-gray-700">No. of Days</label>
-              <div className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-900">
+              <label className="form-label">No. of Days</label>
+              <div className="w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50 px-3 py-2 text-sm text-gray-900 dark:text-gray-300">
                 {noOfDays}
               </div>
               <input type="hidden" name="no_of_days" value={noOfDays} />
             </div>
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-gray-700">Per Day Rate (₹)</label>
+              <label className="form-label">Per Day Rate (₹)</label>
               <input 
                 name="per_day_rate" 
                 type="number" 
                 min="0" 
                 placeholder="0" 
                 onChange={(e) => setTotalAmount(Number(e.target.value) * noOfDays)}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" 
+                className="form-input" 
               />
             </div>
           </div>
@@ -219,38 +218,38 @@ function AddArtistExpenseForm({ eventId, onSuccess }: { eventId: string; onSucce
 
       {payType === "Lump Sum" && (
         <div className="animate-in fade-in slide-in-from-top-2">
-          <label className="mb-1.5 block text-sm font-medium text-gray-700">Total Amount (₹)</label>
+          <label className="form-label">Total Amount (₹)</label>
           <input 
             name="total_amount" 
             type="number" 
             min="0" 
             placeholder="0" 
             onChange={(e) => setTotalAmount(Number(e.target.value))}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" 
+            className="form-input" 
           />
         </div>
       )}
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-gray-700">Advance Paid (₹)</label>
+          <label className="form-label">Advance Paid (₹)</label>
           <input 
             name="advance_paid" 
             type="number" 
             min="0" 
             defaultValue="0" 
             onChange={(e) => setAdvancePaid(Number(e.target.value))}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" 
+            className="form-input" 
           />
         </div>
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-gray-700">Payment Status</label>
+          <label className="form-label">Payment Status</label>
           <div className={cn(
-            "flex h-[38px] items-center rounded-lg border px-3 text-sm font-medium",
-            advancePaid > totalAmount ? "border-purple-200 bg-purple-50 text-purple-700" :
-            advancePaid === totalAmount && totalAmount > 0 ? "border-green-200 bg-green-50 text-green-700" :
-            advancePaid > 0 ? "border-amber-200 bg-amber-50 text-amber-700" :
-            "border-gray-200 bg-gray-50 text-gray-500"
+            "flex h-[42px] items-center rounded-xl border px-3 text-sm font-medium",
+            advancePaid > totalAmount ? "border-purple-200 dark:border-purple-900 bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300" :
+            advancePaid === totalAmount && totalAmount > 0 ? "border-green-200 dark:border-green-900 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300" :
+            advancePaid > 0 ? "border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300" :
+            "border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400"
           )}>
             {advancePaid > totalAmount ? "Overpaid" :
              advancePaid === totalAmount && totalAmount > 0 ? "Paid" : 
@@ -261,8 +260,8 @@ function AddArtistExpenseForm({ eventId, onSuccess }: { eventId: string; onSucce
 
       {error && <p className="text-sm text-red-600">{error}</p>}
       <div className="flex justify-end gap-3 pt-2">
-        <button type="button" onClick={onSuccess} className="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Cancel</button>
-        <button type="submit" disabled={loading} className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-50">{loading ? "Adding..." : "Add Expense"}</button>
+        <button type="button" onClick={onSuccess} className="form-btn-secondary">Cancel</button>
+        <button type="submit" disabled={loading} className="flex-1 rounded-xl bg-brand-600 py-3 text-sm font-semibold text-white hover:bg-brand-700 shadow-lg shadow-brand-600/20 disabled:opacity-50 transition-all">{loading ? "Adding..." : "Add Expense"}</button>
       </div>
     </form>
   );

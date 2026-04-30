@@ -18,34 +18,35 @@ export default function EventsList({ initialEvents }: { initialEvents: EventWith
 
   return (
     <>
-      <div className="mb-6 max-w-md relative">
+      <div className="search-card mb-6 max-w-md relative overflow-hidden">
         <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-          <Search className="h-4 w-4 text-gray-400" />
+          <Search className="h-4 w-4 opacity-40" />
         </div>
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search by event type, client, venue, city..."
-          className="block w-full rounded-lg border-0 bg-white shadow-sm ring-1 ring-inset ring-gray-300 py-2 pl-9 pr-3 text-sm focus:ring-2 focus:ring-inset focus:ring-brand-600 sm:text-sm sm:leading-6"
+          className="block w-full border-0 bg-transparent py-2.5 pl-10 pr-3 text-sm focus:ring-0 sm:text-sm sm:leading-6"
+          style={{ color: 'var(--foreground)' }}
         />
       </div>
 
       {filteredEvents.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-gray-300 p-8 text-center bg-white">
-          <p className="text-sm text-gray-500">No events match your search.</p>
+        <div className="rounded-xl border border-dashed p-8 text-center" style={{ backgroundColor: 'color-mix(in srgb, var(--card), transparent 50%)', borderColor: 'var(--border)' }}>
+          <p className="text-sm opacity-60">No events match your search.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
           {filteredEvents.map((event) => (
             <Link
               key={event.id}
-              href={`/events/${event.id}`}
-              className="group overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all hover:border-brand-200 hover:shadow-md"
+              href={`/events/${event.display_id || event.id}`}
+              className="stat-card group overflow-hidden !p-0 transition-all hover:border-brand-400 hover:shadow-md"
             >
               <div className="relative h-28 bg-gradient-to-br from-gray-100 to-gray-200 sm:h-36">
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/80 text-lg font-bold text-gray-400 backdrop-blur-sm sm:h-16 sm:w-16 sm:text-xl">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/80 dark:bg-slate-800/80 text-lg font-bold text-gray-400 backdrop-blur-sm sm:h-16 sm:w-16 sm:text-xl">
                     {getInitials(event.client_name)}
                   </div>
                 </div>
@@ -58,7 +59,7 @@ export default function EventsList({ initialEvents }: { initialEvents: EventWith
 
               <div className="p-3.5 sm:p-4">
                 <div className="flex items-start justify-between">
-                  <h3 className="text-sm font-semibold text-gray-900 group-hover:text-brand-600 sm:text-base">
+                  <h3 className="text-sm font-semibold group-hover:text-brand-600 sm:text-base">
                     {event.display_id}
                   </h3>
                   {event.payment_status && (
@@ -75,34 +76,34 @@ export default function EventsList({ initialEvents }: { initialEvents: EventWith
                 </div>
 
                 <div className="mt-1.5 space-y-1 sm:mt-2">
-                  <div className="flex items-center gap-1.5 text-xs text-gray-500 sm:text-sm">
-                    <MapPin className="h-3.5 w-3.5 flex-shrink-0" />
+                  <div className="flex items-center gap-1.5 text-xs opacity-60 sm:text-sm">
+                    <MapPin className="h-3.5 w-3.5 flex-shrink-0 opacity-40" />
                     <span className="truncate">{event.venue}, {event.city}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     {event.date_string && (
-                      <div className="flex items-center gap-1.5 text-xs text-gray-500 sm:text-sm">
-                        <CalendarDays className="h-3.5 w-3.5 flex-shrink-0" />
+                      <div className="flex items-center gap-1.5 text-xs opacity-60 sm:text-sm">
+                        <CalendarDays className="h-3.5 w-3.5 flex-shrink-0 opacity-40" />
                         <span className="truncate">{event.date_string}</span>
                       </div>
                     )}
-                    <span className="text-[10px] font-medium text-gray-400">
-                      Team Size: <span className="font-semibold text-gray-700">{event.team_size || 0}</span>
+                    <span className="text-[10px] font-medium opacity-40">
+                      Team Size: <span className="font-semibold opacity-100">{event.team_size || 0}</span>
                     </span>
                   </div>
                 </div>
 
-                <div className="mt-4 grid grid-cols-3 gap-2 rounded-lg bg-gray-50 p-2 sm:p-2.5">
+                <div className="card-inner mt-4 grid grid-cols-3 gap-2 p-2 sm:p-2.5">
                   <div>
-                    <p className="text-[9px] font-medium uppercase text-gray-400 sm:text-[10px]">Package</p>
-                    <p className="text-[11px] font-semibold text-gray-900 sm:text-xs">{formatCurrency(event.package_value)}</p>
+                    <p className="text-[9px] font-medium uppercase opacity-50 sm:text-[10px]">Package</p>
+                    <p className="text-[11px] font-semibold sm:text-xs">{formatCurrency(event.package_value)}</p>
                   </div>
                   <div>
-                    <p className="text-[9px] font-medium uppercase text-gray-400 sm:text-[10px]">Expenses</p>
+                    <p className="text-[9px] font-medium uppercase opacity-50 sm:text-[10px]">Expenses</p>
                     <p className="text-[11px] font-semibold text-rose-600 sm:text-xs">{formatCurrency(event.total_expenses)}</p>
                   </div>
                   <div>
-                    <p className="text-[9px] font-medium uppercase text-gray-400 sm:text-[10px]">Savings</p>
+                    <p className="text-[9px] font-medium uppercase opacity-50 sm:text-[10px]">Savings</p>
                     <p className={cn(
                       "text-[11px] font-semibold sm:text-xs",
                       event.savings >= 0 ? "text-emerald-600" : "text-rose-600"

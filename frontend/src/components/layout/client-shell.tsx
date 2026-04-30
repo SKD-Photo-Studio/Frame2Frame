@@ -29,13 +29,14 @@ export default function ClientShell({ children }: { children: React.ReactNode })
   const showSidebar = mounted && !isLoginPage && !!session
 
   return (
-    <>
+    <div className="relative min-h-screen">
+
       {showSidebar && <Sidebar />}
-      <main className={`min-h-screen ${showSidebar ? 'pt-14 pb-20 md:ml-64 md:pt-0 md:pb-0' : ''}`}>
+      <main className={`relative z-0 min-h-screen ${showSidebar ? 'pt-14 pb-20 md:ml-64 md:pt-0 md:pb-0' : ''}`}>
         <div className={showSidebar ? 'px-4 py-4 sm:px-6 md:px-8 md:py-6' : ''}>
           {children}
         </div>
       </main>
-    </>
+    </div>
   )
 }

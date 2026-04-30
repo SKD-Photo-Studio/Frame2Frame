@@ -1,12 +1,11 @@
 import { api } from "@/lib/api";
 import AddEventButton from "@/components/forms/add-event-form";
 import EventsList from "./events-list";
-import { createClient } from "@/lib/supabase.server";
+import { getSession } from "@/lib/supabase.server";
 import BulkOperationsWrapper from "@/components/ui/bulk-operations-wrapper";
 
 export default async function EventsPage() {
-  const supabase = createClient();
-  const { data: { session } } = await supabase.auth.getSession();
+  const { data: { session } } = await getSession();
   const token = session?.access_token;
   
   const events = await api.events.list(token);

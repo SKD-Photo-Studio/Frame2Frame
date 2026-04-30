@@ -46,7 +46,7 @@ export default function Popover({
       {isOpen && (
         <div 
           className={cn(
-            "absolute z-50 mt-2 min-w-[280px] rounded-xl border border-gray-200 bg-white p-2 shadow-xl animate-in fade-in zoom-in-95 duration-200",
+            "absolute z-50 mt-2 min-w-[280px] rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#1a1a1a] p-2 shadow-xl animate-in fade-in zoom-in-95 duration-200",
             alignmentClasses[align],
             className
           )}

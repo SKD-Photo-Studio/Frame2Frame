@@ -1,7 +1,7 @@
 import { api } from "@/lib/api";
 import AddTeamMemberButton from "@/components/forms/add-team-form";
 import TeamList from "./team-list";
-import { createClient } from "@/lib/supabase.server";
+import { getSession } from "@/lib/supabase.server";
 import BulkOperationsWrapper from "@/components/ui/bulk-operations-wrapper";
 
 const roleColors: Record<string, string> = {
@@ -16,8 +16,7 @@ const roleColors: Record<string, string> = {
 };
 
 export default async function TeamPage() {
-  const supabase = createClient();
-  const { data: { session } } = await supabase.auth.getSession();
+  const { data: { session } } = await getSession();
   const token = session?.access_token;
   
   const members = await api.team.list(token);

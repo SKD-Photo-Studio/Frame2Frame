@@ -1,0 +1,17 @@
+name = "skd-photo-studio"
+compatibility_date = "2026-04-01"
+compatibility_flags = ["nodejs_compat"]
+
+[pages_build_config]
+build_command = "npm run build"
+build_output_directory = ".next"
+
+# Cloudflare R2 Buckets (Image Hosting)
+[[r2_buckets]]
+binding = "PHOTO_ASSETS"
+bucket_name = "skd-photo-assets"
+
+# Environment Variables
+[vars]
+NEXT_PUBLIC_SUPABASE_URL = ""
+# Secrets (NEXT_PUBLIC_SUPABASE_ANON_KEY, etc.) should be added via Dashboard

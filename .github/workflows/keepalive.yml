@@ -1,0 +1,28 @@
+name: Supabase Keep-Alive
+
+on:
+  schedule:
+    # Runs at 00:00 every 6 days
+    - cron: '0 0 */6 * *'
+  workflow_dispatch: # Allow manual trigger for testing
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Ping Supabase Project
+      env:
+        SUPABASE_KEEPALIVE_URL: ${{ secrets.SUPABASE_KEEPALIVE_URL }}
+      run: |
+        if [ -z "$SUPABASE_KEEPALIVE_URL" ]; then
+          echo "❌ SUPABASE_KEEPALIVE_URL is not set in GitHub Secrets."
+          exit 1
+        fi
+        
+        echo "Pinging Supabase to prevent 7-day auto-pause..."
+        
+        # A simple curl to a public health/ping endpoint or generic table
+        # We use -f to fail the action if the HTTP code is 400+
+        curl -f -X GET "$SUPABASE_KEEPALIVE_URL"
+        
+        echo "✅ Ping successful."

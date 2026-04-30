@@ -24,15 +24,19 @@ const colorVariants = {
 
 export function StatCard({ label, value, icon, color, className }: StatCardProps) {
   return (
-    <div className={cn("stat-card flex items-center gap-2.5 rounded-xl border border-gray-200 bg-white p-3 shadow-sm transition-all hover:shadow-md sm:gap-3 sm:p-4", className)}>
-      <div className={cn("flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg sm:h-10 sm:w-10", colorVariants[color])}>
+    <div className={cn("stat-card flex items-center gap-2.5", className)}>
+      <div className={cn(
+        "flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg sm:h-10 sm:w-10", 
+        colorVariants[color],
+        "dark:bg-opacity-10 dark:text-opacity-90"
+      )}>
         {icon}
       </div>
       <div className="min-w-0">
-        <p className="text-[10px] font-medium uppercase tracking-wide text-gray-400 sm:text-xs">
+        <p className="text-[10px] font-medium uppercase tracking-wide opacity-60 sm:text-xs">
           {label}
         </p>
-        <p className="mt-0.5 truncate text-base font-bold text-gray-900 sm:text-lg lg:text-xl">
+        <p className="mt-0.5 truncate text-base font-bold sm:text-lg lg:text-xl">
           {value}
         </p>
       </div>

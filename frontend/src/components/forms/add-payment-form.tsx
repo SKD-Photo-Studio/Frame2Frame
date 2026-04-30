@@ -59,7 +59,7 @@ export default function AddPaymentButton({ eventId }: { eventId: string }) {
         <form onSubmit={handleSubmit} className="space-y-6 pt-2">
           {/* Installment Type Toggle */}
           <div>
-            <label className="mb-2 block text-sm font-semibold text-gray-700">Installment Type *</label>
+            <label className="form-label">Installment Type *</label>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
               {INSTALLMENT_TYPES.map((t) => (
                 <button
@@ -68,8 +68,8 @@ export default function AddPaymentButton({ eventId }: { eventId: string }) {
                   onClick={() => setInstallmentType(t)}
                   className={`rounded-lg px-3 py-2 text-xs font-medium transition-all ${
                     installmentType === t
-                      ? "bg-brand-600 text-white shadow-md ring-2 ring-brand-600 ring-offset-2"
-                      : "bg-gray-50 text-gray-600 hover:bg-gray-100 border border-gray-200"
+                      ? "bg-brand-600 text-white shadow-md ring-2 ring-brand-600 ring-offset-2 ring-offset-white dark:ring-offset-[#1a1a1a]"
+                      : "bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-800"
                   }`}
                 >
                   {t}
@@ -81,7 +81,7 @@ export default function AddPaymentButton({ eventId }: { eventId: string }) {
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             {/* Amount */}
             <div>
-              <label className="mb-2 block text-sm font-semibold text-gray-700">Amount (₹) *</label>
+              <label className="form-label">Amount (₹) *</label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">₹</span>
                 <input 
@@ -89,15 +89,15 @@ export default function AddPaymentButton({ eventId }: { eventId: string }) {
                   type="number" 
                   min="0" 
                   placeholder="0" 
-                  className="w-full rounded-xl border border-gray-200 pl-8 pr-4 py-2.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/10 transition-all font-medium" 
+                  className="form-input !pl-8" 
                 />
               </div>
             </div>
 
             {/* Mode of Payment Toggle */}
             <div>
-              <label className="mb-2 block text-sm font-semibold text-gray-700">Payment Mode</label>
-              <div className="flex p-1 bg-gray-100 rounded-xl">
+              <label className="form-label">Payment Mode</label>
+              <div className="flex p-1 bg-gray-100 dark:bg-gray-800 rounded-xl">
                 {MODES.map((m) => (
                   <button
                     key={m}
@@ -105,8 +105,8 @@ export default function AddPaymentButton({ eventId }: { eventId: string }) {
                     onClick={() => setPaymentMethod(m)}
                     className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-lg transition-all ${
                       paymentMethod === m
-                        ? "bg-white text-gray-900 shadow-sm"
-                        : "text-gray-500 hover:text-gray-700"
+                        ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm"
+                        : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
                     }`}
                   >
                     {m === "Online" ? <CreditCard className="h-4 w-4" /> : <Banknote className="h-4 w-4" />}
@@ -121,11 +121,11 @@ export default function AddPaymentButton({ eventId }: { eventId: string }) {
             {/* Transaction ID */}
             {paymentMethod === "Online" ? (
               <div>
-                <label className="mb-2 block text-sm font-semibold text-gray-700">Transaction ID</label>
+                <label className="form-label">Transaction ID</label>
                 <input 
                   name="transaction_id" 
                   placeholder="TXN..." 
-                  className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/10 transition-all" 
+                  className="form-input" 
                 />
               </div>
             ) : (
@@ -134,12 +134,12 @@ export default function AddPaymentButton({ eventId }: { eventId: string }) {
 
             {/* Date */}
             <div>
-              <label className="mb-2 block text-sm font-semibold text-gray-700">Payment Date</label>
+              <label className="form-label">Payment Date</label>
               <input 
                 name="payment_date" 
                 type="date" 
                 defaultValue={new Date().toISOString().split("T")[0]} 
-                className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/10 transition-all" 
+                className="form-input" 
               />
             </div>
           </div>
@@ -154,14 +154,14 @@ export default function AddPaymentButton({ eventId }: { eventId: string }) {
             <button 
               type="button" 
               onClick={() => setOpen(false)} 
-              className="flex-1 rounded-xl border border-gray-200 bg-white py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
+              className="form-btn-secondary"
             >
               Cancel
             </button>
             <button 
               type="submit" 
               disabled={loading} 
-              className="flex-1 rounded-xl bg-brand-600 py-3 text-sm font-semibold text-white hover:bg-brand-700 shadow-lg shadow-brand-200 disabled:opacity-50 transition-all"
+              className="flex-1 rounded-xl bg-brand-600 py-3 text-sm font-semibold text-white hover:bg-brand-700 shadow-lg shadow-brand-600/20 disabled:opacity-50 transition-all"
             >
               {loading ? "Processing..." : "Confirm Payment"}
             </button>

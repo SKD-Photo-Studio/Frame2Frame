@@ -59,7 +59,7 @@ export function Combobox({
         <input
           ref={inputRef}
           type="text"
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 pr-8"
+          className="w-full rounded-lg border border-gray-300 dark:border-gray-800 bg-white dark:bg-[#1a1a1a] px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 pr-8"
           placeholder={placeholder}
           value={query}
           onChange={(e) => {
@@ -81,7 +81,7 @@ export function Combobox({
       </div>
 
       {open && (
-        <div className="absolute z-50 mt-1 w-full rounded-lg border border-gray-200 bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm overflow-hidden flex flex-col">
+        <div className="absolute z-50 mt-1 w-full rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#1a1a1a] shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm overflow-hidden flex flex-col">
           <div className="max-h-60 overflow-y-auto py-1">
             {filteredOptions.length === 0 && !freeText ? (
               <div className="relative cursor-default select-none py-2 px-4 text-sm text-gray-500">
@@ -93,8 +93,8 @@ export function Combobox({
               <div
                 key={option.value}
                 className={cn(
-                  "relative cursor-pointer select-none py-2 pl-3 pr-9 hover:bg-brand-50 hover:text-brand-900 text-gray-900 text-sm",
-                  value === option.value && "bg-brand-50 font-medium text-brand-900"
+                  "relative cursor-pointer select-none py-2 pl-3 pr-9 hover:bg-brand-50 dark:hover:bg-brand-900/20 hover:text-brand-900 dark:hover:text-brand-400 text-gray-900 dark:text-gray-300 text-sm",
+                  value === option.value && "bg-brand-50 dark:bg-brand-900/30 font-medium text-brand-900 dark:text-brand-400"
                 )}
                 onClick={() => {
                   onChange(option.value);
@@ -109,7 +109,7 @@ export function Combobox({
 
           {onAddNew && (
             <div
-              className="border-t border-gray-100 flex items-center cursor-pointer select-none py-2.5 px-3 text-sm text-brand-600 hover:bg-brand-50 font-semibold bg-gray-50/50"
+              className="border-t border-gray-100 dark:border-gray-800 flex items-center cursor-pointer select-none py-2.5 px-3 text-sm text-brand-600 dark:text-brand-400 hover:bg-brand-50 dark:hover:bg-brand-900/20 font-semibold bg-gray-50/50 dark:bg-gray-800/50"
               onClick={() => {
                 setOpen(false);
                 onAddNew();

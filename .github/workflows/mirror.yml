@@ -1,0 +1,35 @@
+name: Mirror to Production (Cloudflare)
+
+on:
+  workflow_dispatch: # Mandatory Manual Gate
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Mirror to SKD-Photo-Studio
+        env:
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+        run: |
+          if [ -z "$DEPLOY_KEY" ]; then
+            echo "❌ DEPLOY_KEY is not set in GitHub Secrets."
+            exit 1
+          fi
+          
+          mkdir -p ~/.ssh
+          echo "$DEPLOY_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+          
+          # Add the production repository as a remote
+          git remote add production git@github.com:SKD-Photo-Studio/Frame2Frame.git
+          
+          # Force push the main branch to the production repository
+          git push --force production main
+          
+          echo "✅ Successfully mirrored to production repository."

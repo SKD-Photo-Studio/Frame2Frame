@@ -23,13 +23,32 @@ export function formatDate(isoDate: string): string {
   });
 }
 
+export function formatDates(dates: string[]): string {
+  return (dates ?? [])
+    .map((d) => formatDate(d))
+    .join(", ");
+}
+
 export function getInitials(name: string): string {
-  return name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
+  if (!name) return "";
+  
+  // Handle names with "&" (Couples)
+  if (name.includes("&")) {
+    const parts = name.split("&").map(p => p.trim());
+    if (parts.length >= 2) {
+      const firstInitial = parts[0][0] || "";
+      const secondInitial = parts[1][0] || "";
+      return `${firstInitial}&${secondInitial}`.toUpperCase();
+    }
+  }
+
+  // Standard First Last logic
+  const words = name.split(" ").filter(w => w.length > 0);
+  if (words.length >= 2) {
+    return (words[0][0] + words[1][0]).toUpperCase();
+  }
+  
+  return (words[0]?.slice(0, 2) || "").toUpperCase();
 }
 
 export function getPaidStatusColor(status: string): string {
@@ -64,4 +83,33 @@ export function getEventTypeColor(type: string): string {
     default:
       return "bg-gray-100 text-gray-600";
   }
+}
+
+export function round(val: number): number {
+  return Math.round((val + Number.EPSILON) * 100) / 100;
+}
+
+export function calcBalance(total: number, paid: number) {
+  const rTotal = round(total);
+  const rPaid = round(paid);
+  const balance = round(rTotal - rPaid);
+
+  let status: "Unpaid" | "Partial" | "Paid" | "Overpaid" = "Unpaid";
+
+  if (rTotal <= 0) {
+    status = rPaid > 0 ? "Overpaid" : "Paid";
+    return { balance, status };
+  }
+
+  if (rPaid === 0) {
+    status = "Unpaid";
+  } else if (rPaid < rTotal) {
+    status = "Partial";
+  } else if (rPaid === rTotal) {
+    status = "Paid";
+  } else if (rPaid > rTotal) {
+    status = "Overpaid";
+  }
+
+  return { balance, status };
 }

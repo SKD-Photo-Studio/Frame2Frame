@@ -6,70 +6,91 @@ import { notFound } from "next/navigation";
 import EditClientButton from "@/components/forms/edit-client-form";
 import AddEventButton from "@/components/forms/add-event-form";
 
-import { createClient } from "@/lib/supabase.server";
+import { createServerSupabaseClient, getSession } from "@/lib/supabase.server";
 
 export default async function ClientDetailPage({
   params,
+  searchParams,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ from?: string; eventId?: string; fromName?: string }>;
 }) {
-  const supabase = createClient();
-  const { data: { session } } = await supabase.auth.getSession();
+  const { id } = await params;
+  const sp = await searchParams;
+  const { data: { session } } = await getSession();
   const token = session?.access_token;
 
   let data;
   try {
-    data = await api.clients.get(params.id, token);
+    data = await api.clients.get(id, token);
   } catch {
     notFound();
   }
 
   const { client, events: clientEvents } = data;
 
+  // Determine back link
+  let backHref = "/clients";
+  let backLabel = "Back to Clients";
+
+  if (sp.from === "event" && sp.eventId) {
+    backHref = `/events/${sp.eventId}`;
+    backLabel = sp.fromName ? `Back to ${sp.fromName}` : "Back to Event";
+  }
+
   return (
     <div>
       <Link
-        href="/clients"
-        className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 transition-colors hover:text-gray-900"
+        href={backHref}
+        className="stat-card !p-2.5 !mb-5 inline-flex items-center gap-2 text-sm font-medium transition-all hover:bg-gray-50 dark:hover:bg-gray-800/50 hover:shadow-sm group"
       >
-        <ArrowLeft className="h-4 w-4" />
-        Back to Clients
+        <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" />
+        {backLabel}
       </Link>
 
-      <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
+      <div className="stat-card">
         <div className="flex flex-col items-center gap-4 text-center sm:flex-row sm:items-start sm:gap-5 sm:text-left">
           <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 text-xl font-bold text-white sm:h-20 sm:w-20 sm:text-2xl">
             {getInitials(client.client_name)}
           </div>
           <div className="min-w-0 flex-1">
-            <h1 className="text-xl font-bold text-gray-900 sm:text-2xl">{client.client_name}</h1>
-            <p className="mt-0.5 text-xs text-gray-500 sm:mt-1 sm:text-sm">Client ID: {client.display_id}</p>
+            <h1 className="text-xl font-bold sm:text-2xl">{client.client_name}</h1>
+            <p className="mt-0.5 text-xs opacity-60 sm:mt-1 sm:text-sm">Client ID: {client.display_id}</p>
 
             <div className="mt-3 flex flex-wrap justify-center gap-3 sm:mt-4 sm:justify-start sm:gap-4">
-              <div className="flex items-center gap-2 text-xs text-gray-600 sm:text-sm">
-                <Phone className="h-4 w-4 text-gray-400" />
+              <div className="flex items-center gap-2 text-xs opacity-70 sm:text-sm">
+                <Phone className="h-4 w-4 opacity-40" />
                 {client.phone_number}
               </div>
               {client.email && (
-                <div className="flex items-center gap-2 text-xs text-gray-600 sm:text-sm">
-                  <Mail className="h-4 w-4 text-gray-400" />
+                <div className="flex items-center gap-2 text-xs opacity-70 sm:text-sm">
+                  <Mail className="h-4 w-4 opacity-40" />
                   {client.email}
                 </div>
               )}
             </div>
 
             {client.notes && (
-              <p className="mt-2 text-sm italic text-gray-600 sm:mt-3">&ldquo;{client.notes}&rdquo;</p>
+              <p className="mt-2 text-sm italic opacity-70 sm:mt-3">&ldquo;{client.notes}&rdquo;</p>
             )}
 
             <div className="mt-3 flex justify-center gap-2 sm:mt-4 sm:justify-start">
-              <button className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
+              <button 
+                className="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors opacity-80 hover:opacity-100"
+                style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)' }}
+              >
                 <Phone className="h-3.5 w-3.5" /> Call
               </button>
-              <button className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
+              <button 
+                className="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors opacity-80 hover:opacity-100"
+                style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)' }}
+              >
                 <MessageSquare className="h-3.5 w-3.5" /> SMS
               </button>
-              <button className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
+              <button 
+                className="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors opacity-80 hover:opacity-100"
+                style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)' }}
+              >
                 <Mail className="h-3.5 w-3.5" /> Email
               </button>
               <EditClientButton client={client} />
@@ -79,23 +100,23 @@ export default async function ClientDetailPage({
       </div>
 
       <div className="mt-5 sm:mt-6">
-        <div className="mb-3 flex flex-col gap-3 sm:mb-4 sm:flex-row sm:items-center sm:justify-between">
-          <h2 className="section-title">Booked Events ({clientEvents.length})</h2>
+        <div className="stat-card !p-3.5 !mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <h2 className="section-title !mb-0 text-base sm:text-lg">Booked Events ({clientEvents.length})</h2>
           <AddEventButton initialClientId={client.id} />
         </div>
 
         {clientEvents.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-gray-300 bg-white py-10 text-center sm:py-12">
-            <Calendar className="mx-auto h-10 w-10 text-gray-300" />
-            <p className="mt-2 text-sm text-gray-500">No events booked yet</p>
+          <div className="rounded-xl border border-dashed py-10 text-center sm:py-12" style={{ backgroundColor: 'color-mix(in srgb, var(--card), transparent 50%)', borderColor: 'var(--border)' }}>
+            <Calendar className="mx-auto h-10 w-10 opacity-20" />
+            <p className="mt-2 text-sm opacity-50">No events booked yet</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2">
             {clientEvents.map((event) => (
               <Link
                 key={event.id}
-                href={`/events/${event.id}`}
-                className="group rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-all hover:border-brand-200 hover:shadow-md sm:p-5"
+                href={`/events/${(event as any).display_id || (event as any).id}?from=client&clientId=${(client as any).display_id || (client as any).id}&fromName=${(client as any).client_name}`}
+                className="stat-card group transition-all hover:border-brand-400 hover:shadow-md"
               >
                   <div className="flex items-start justify-between">
                     <span className={cn("inline-block rounded-full px-2.5 py-0.5 text-xs font-medium", getEventTypeColor(event.event_type))}>
@@ -110,28 +131,28 @@ export default async function ClientDetailPage({
                       </span>
                     )}
                   </div>
-                  <h3 className="mt-2 text-sm font-semibold text-gray-900 group-hover:text-brand-600 sm:text-base">
+                  <h3 className="mt-2 text-sm font-semibold group-hover:text-brand-600 sm:text-base">
                     {event.display_id}
                   </h3>
-                  <p className="mt-1 text-xs text-gray-500 sm:text-sm">{event.venue}, {event.city}</p>
+                  <p className="mt-1 text-xs opacity-60 sm:text-sm">{event.venue}, {event.city}</p>
                   <div className="mt-1 flex items-center justify-between">
-                    {event.date_string && <p className="text-xs text-gray-500">{event.date_string}</p>}
-                    <span className="text-[10px] font-medium text-gray-400">
-                      Team Size: <span className="font-semibold text-gray-700">{event.team_size || 0}</span>
+                    {event.date_string && <p className="text-xs opacity-60">{event.date_string}</p>}
+                    <span className="text-[10px] font-medium opacity-50">
+                      Team Size: <span className="font-semibold opacity-100">{event.team_size || 0}</span>
                     </span>
                   </div>
 
-                <div className="mt-3 grid grid-cols-3 gap-2 rounded-lg bg-gray-50 p-2.5 sm:mt-4 sm:gap-3 sm:p-3">
+                <div className="mt-3 grid grid-cols-3 gap-2 rounded-lg p-2.5 sm:mt-4 sm:gap-3 sm:p-3" style={{ backgroundColor: 'color-mix(in srgb, var(--foreground), transparent 95%)' }}>
                   <div>
-                    <p className="text-[10px] font-medium uppercase text-gray-400">Package</p>
-                    <p className="text-xs font-semibold text-gray-900 sm:text-sm">{formatCurrency(event.package_value)}</p>
+                    <p className="text-[10px] font-medium uppercase opacity-50">Package</p>
+                    <p className="text-xs font-semibold sm:text-sm">{formatCurrency(event.package_value)}</p>
                   </div>
                   <div>
-                    <p className="text-[10px] font-medium uppercase text-gray-400">Expenses</p>
+                    <p className="text-[10px] font-medium uppercase opacity-50">Expenses</p>
                     <p className="text-xs font-semibold text-red-600 sm:text-sm">{formatCurrency(event.total_expenses)}</p>
                   </div>
                   <div>
-                    <p className="text-[10px] font-medium uppercase text-gray-400">Savings</p>
+                    <p className="text-[10px] font-medium uppercase opacity-50">Savings</p>
                     <p className={cn("text-xs font-semibold sm:text-sm", event.savings >= 0 ? "text-brand-600" : "text-red-600")}>
                       {formatCurrency(event.savings)}
                     </p>

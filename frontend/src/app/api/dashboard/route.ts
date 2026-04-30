@@ -20,8 +20,8 @@ export async function GET() {
       supabaseAdmin.from('events_master').select('*', { count: 'exact', head: true }).eq('tenant_id', tenantId).eq('is_active', true),
       supabaseAdmin.from('workspace_memberships').select('*', { count: 'exact', head: true }).eq('tenant_id', tenantId).eq('role', 'MEMBER').eq('is_active', true),
       supabaseAdmin.from('events_master').select('id, display_id, event_type, package_value, event_dates, clients_master(client_name)').eq('tenant_id', tenantId).eq('is_active', true).order('display_id', { ascending: false }),
-      supabaseAdmin.from('artist_expenses').select('event_id, total_amount, advance_paid').eq('tenant_id', tenantId).eq('is_active', true),
-      supabaseAdmin.from('output_expenses').select('event_id, total_amount, advance_paid').eq('tenant_id', tenantId).eq('is_active', true),
+      supabaseAdmin.from('artist_expenses').select('event_id, total_amount, advance_paid, user_id').eq('tenant_id', tenantId).eq('is_active', true),
+      supabaseAdmin.from('output_expenses').select('event_id, total_amount, advance_paid, user_id').eq('tenant_id', tenantId).eq('is_active', true),
       supabaseAdmin.from('client_payments').select('event_id, amount').eq('tenant_id', tenantId).eq('is_active', true),
     ]);
 
@@ -52,20 +52,30 @@ export async function GET() {
       outputExpByEvent[o.event_id] = (outputExpByEvent[o.event_id] ?? 0) + (o.total_amount ?? 0);
     });
 
-    // Recent 5 events
-    const recentEvents = (events ?? []).slice(0, 5).map((e) => {
+    // Process all events to include financials and formatted dates
+    const processedEvents = (events ?? []).map((e) => {
       const collected = paymentsByEvent[e.id] ?? 0;
       const artistTotal = artistExpByEvent[e.id] ?? 0;
       const outputTotal = outputExpByEvent[e.id] ?? 0;
       const totalExpenses = artistTotal + outputTotal;
 
-      const dateString = (e.event_dates as string[] ?? [])
+      const eventArtists = Array.isArray(artistExp) ? artistExp.filter(a => a?.event_id === e.id) : [];
+      const eventOutputs = Array.isArray(outputExp) ? outputExp.filter(o => o?.event_id === e.id) : [];
+      
+      const uniqueMembers = new Set([
+        ...eventArtists.map(a => a?.user_id),
+        ...eventOutputs.map(o => o?.user_id)
+      ].filter(Boolean));
+
+      const allDates = (e.event_dates as string[] ?? []).sort();
+      const dateString = allDates
         .map((d) =>
           new Date(d).toLocaleDateString('en-GB', {
             day: '2-digit', month: 'short', year: 'numeric',
           })
         )
         .join(', ');
+
       return {
         ...e,
         client_name:     (e.clients_master as any)?.client_name ?? 'Unknown',
@@ -74,29 +84,24 @@ export async function GET() {
         client_balance:  (e.package_value ?? 0) - collected,
         total_expenses:  totalExpenses,
         savings:         (e.package_value ?? 0) - totalExpenses,
+        team_size:       uniqueMembers.size,
         clients_master:  undefined,
+        all_dates:       allDates,
       };
     });
 
-    // Upcoming 5 event dates
-    type UpcomingDate = { date: string; event_id: string; event_type: string; display_id: string; client_name: string };
-    const upcomingDates: UpcomingDate[] = [];
+    // Recent 5 events (sorted by display_id desc from DB)
+    const recentEvents = processedEvents.slice(0, 5);
 
-    (events ?? []).forEach((e) => {
-      (e.event_dates as string[] ?? []).forEach((d) => {
-        if (d >= today) {
-          upcomingDates.push({
-            date:        d,
-            event_id:    e.id,
-            event_type:  e.event_type,
-            display_id:  e.display_id,
-            client_name: (e.clients_master as any)?.client_name ?? 'Unknown',
-          });
-        }
-      });
-    });
-
-    upcomingDates.sort((a, b) => a.date.localeCompare(b.date));
+    // Upcoming 5 events (filtered by dates >= today, sorted by soonest date)
+    const upcomingEvents = processedEvents
+      .filter(e => e.all_dates.some(d => d >= today))
+      .sort((a, b) => {
+        const aSoonest = a.all_dates.find(d => d >= today) || '9999-12-31';
+        const bSoonest = b.all_dates.find(d => d >= today) || '9999-12-31';
+        return aSoonest.localeCompare(bSoonest);
+      })
+      .slice(0, 5);
 
     return NextResponse.json({
       total_clients:      totalClients ?? 0,
@@ -112,7 +117,7 @@ export async function GET() {
       team_balance:       totalExpenses - totalExpPaid,
       total_savings:      totalRevenue - totalExpenses,
       recent_events:      recentEvents,
-      upcoming_dates:     upcomingDates.slice(0, 5),
+      upcoming_events:    upcomingEvents,
     });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });

@@ -9,52 +9,74 @@ import { StatCard } from "@/components/ui/stat-card";
 import { notFound } from "next/navigation";
 import EditTeamMemberButton from "@/components/forms/edit-team-form";
 
-import { createClient } from "@/lib/supabase.server";
+import { createServerSupabaseClient, getSession } from "@/lib/supabase.server";
 
 export default async function TeamDetailPage({
   params,
+  searchParams,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ from?: string; eventId?: string; fromName?: string }>;
 }) {
-  const supabase = createClient();
-  const { data: { session } } = await supabase.auth.getSession();
+  const { id } = await params;
+  const sp = await searchParams;
+  const { data: { session } } = await getSession();
   const token = session?.access_token;
 
   let data;
   try {
-    data = await api.team.get(params.id, token);
+    data = await api.team.get(id, token);
   } catch {
     notFound();
   }
 
   const { member, artist_expenses, output_expenses, totals } = data;
 
+  // Determine back link
+  let backHref = "/team";
+  let backLabel = "Back to Team";
+
+  if (sp.from === "event" && sp.eventId) {
+    backHref = `/events/${sp.eventId}`;
+    backLabel = sp.fromName ? `Back to ${sp.fromName}` : "Back to Event";
+  }
+
   return (
     <div>
-      <Link href="/team" className="mb-3 inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 transition-colors hover:text-gray-900 sm:mb-4">
-        <ArrowLeft className="h-4 w-4" /> Back to Team
+      <Link
+        href={backHref}
+        className="stat-card !p-2.5 !mb-5 inline-flex items-center gap-2 text-sm font-medium transition-all hover:bg-gray-50 dark:hover:bg-gray-800/50 hover:shadow-sm group"
+      >
+        <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" />
+        {backLabel}
       </Link>
 
       {/* Member Header */}
-      <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
+      <div className="stat-card">
         <div className="flex flex-col items-center gap-4 text-center sm:flex-row sm:items-start sm:gap-5 sm:text-left">
           <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-500 to-purple-600 text-xl font-bold text-white sm:h-20 sm:w-20 sm:text-2xl">
             {getInitials(member.full_name)}
           </div>
           <div className="min-w-0 flex-1">
-            <h1 className="text-xl font-bold text-gray-900 sm:text-2xl">{member.full_name}</h1>
-            <p className="mt-0.5 text-sm text-gray-500">{member.usual_role}</p>
-            <p className="mt-0.5 text-xs text-gray-400">Total Assignments: {totals.assignments}</p>
+            <h1 className="text-xl font-bold sm:text-2xl">{member.full_name}</h1>
+            <p className="mt-0.5 text-sm opacity-70">{member.usual_role}</p>
+            <p className="mt-0.5 text-xs opacity-50">Total Assignments: {totals.assignments}</p>
 
-            <div className="mt-2 flex items-center justify-center gap-2 text-sm text-gray-600 sm:mt-3 sm:justify-start">
-              <Phone className="h-4 w-4 text-gray-400" /> {member.phone_number}
+            <div className="mt-2 flex items-center justify-center gap-2 text-sm opacity-80 sm:mt-3 sm:justify-start">
+              <Phone className="h-4 w-4 opacity-40" /> {member.phone_number}
             </div>
 
             <div className="mt-3 flex justify-center gap-2 sm:mt-4 sm:justify-start">
-              <button className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
+              <button 
+                className="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors opacity-80 hover:opacity-100"
+                style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)' }}
+              >
                 <Phone className="h-3.5 w-3.5" /> Call
               </button>
-              <button className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
+              <button 
+                className="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors opacity-80 hover:opacity-100"
+                style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)' }}
+              >
                 <MessageSquare className="h-3.5 w-3.5" /> SMS
               </button>
               <EditTeamMemberButton member={member} />
@@ -74,32 +96,34 @@ export default async function TeamDetailPage({
       {/* Artist Assignments */}
       {artist_expenses.length > 0 && (
         <div className="mt-6 sm:mt-8">
-          <h2 className="section-title mb-3 sm:mb-4">
-            Artist Assignments <span className="text-xs font-normal text-gray-400 sm:text-sm">({artist_expenses.length})</span>
-          </h2>
+          <div className="stat-card !p-3 !mb-4">
+            <h2 className="section-title !mb-0 text-base sm:text-lg">
+              Artist Assignments <span className="text-xs font-normal opacity-60 sm:text-sm">({artist_expenses.length})</span>
+            </h2>
+          </div>
           <div className="-mx-4 overflow-x-auto sm:mx-0">
             <div className="inline-block min-w-full px-4 sm:px-0">
               <div className="overflow-hidden rounded-lg border border-gray-200">
                 <table className="min-w-[640px] w-full text-sm sm:min-w-0">
                   <thead>
                     <tr className="border-b border-gray-100 bg-gray-50/80">
-                      <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 sm:px-4 sm:py-3 sm:text-sm">Event</th>
-                      <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 sm:px-4 sm:py-3 sm:text-sm">Role</th>
-                      <th className="px-3 py-2.5 text-right text-xs font-medium text-gray-500 sm:px-4 sm:py-3 sm:text-sm">Total</th>
-                      <th className="px-3 py-2.5 text-right text-xs font-medium text-gray-500 sm:px-4 sm:py-3 sm:text-sm">Advance</th>
-                      <th className="px-3 py-2.5 text-right text-xs font-medium text-gray-500 sm:px-4 sm:py-3 sm:text-sm">Balance</th>
-                      <th className="px-3 py-2.5 text-center text-xs font-medium text-gray-500 sm:px-4 sm:py-3 sm:text-sm">Status</th>
+                      <th className="px-3 py-2.5 text-left text-xs font-medium opacity-60 sm:px-4 sm:py-3 sm:text-sm">Event</th>
+                      <th className="px-3 py-2.5 text-left text-xs font-medium opacity-60 sm:px-4 sm:py-3 sm:text-sm">Role</th>
+                      <th className="px-3 py-2.5 text-right text-xs font-medium opacity-60 sm:px-4 sm:py-3 sm:text-sm">Total</th>
+                      <th className="px-3 py-2.5 text-right text-xs font-medium opacity-60 sm:px-4 sm:py-3 sm:text-sm">Advance</th>
+                      <th className="px-3 py-2.5 text-right text-xs font-medium opacity-60 sm:px-4 sm:py-3 sm:text-sm">Balance</th>
+                      <th className="px-3 py-2.5 text-center text-xs font-medium opacity-60 sm:px-4 sm:py-3 sm:text-sm">Status</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-50">
                     {artist_expenses.map((a) => (
-                      <tr key={a.id} className="transition-colors hover:bg-gray-50">
+                      <tr key={a.id} className="transition-colors hover:bg-gray-50/50 dark:hover:bg-slate-800/30">
                         <td className="whitespace-nowrap px-3 py-2.5 sm:px-4 sm:py-3">
-                          <Link href={`/events/${a.event_id}`} className="text-xs font-medium text-brand-600 hover:underline sm:text-sm">{a.event_name}</Link>
+                          <Link href={`/events/${(a as any).event_display_id || (a as any).event_id}?from=team&memberId=${(member as any).display_id || (member as any).id}&fromName=${(member as any).full_name}`} className="text-xs font-medium text-brand-600 hover:underline sm:text-sm">{(a as any).event_name}</Link>
                         </td>
-                        <td className="whitespace-nowrap px-3 py-2.5 text-xs text-gray-600 sm:px-4 sm:py-3 sm:text-sm">{a.assignment_role}</td>
-                        <td className="whitespace-nowrap px-3 py-2.5 text-right text-xs font-medium text-gray-900 sm:px-4 sm:py-3 sm:text-sm">{formatCurrency(a.total_amount)}</td>
-                        <td className="whitespace-nowrap px-3 py-2.5 text-right text-xs text-gray-600 sm:px-4 sm:py-3 sm:text-sm">{formatCurrency(a.advance_paid)}</td>
+                        <td className="whitespace-nowrap px-3 py-2.5 text-xs opacity-70 sm:px-4 sm:py-3 sm:text-sm">{a.assignment_role}</td>
+                        <td className="whitespace-nowrap px-3 py-2.5 text-right text-xs font-medium sm:px-4 sm:py-3 sm:text-sm">{formatCurrency(a.total_amount)}</td>
+                        <td className="whitespace-nowrap px-3 py-2.5 text-right text-xs opacity-70 sm:px-4 sm:py-3 sm:text-sm">{formatCurrency(a.advance_paid)}</td>
                         <td className="whitespace-nowrap px-3 py-2.5 text-right text-xs font-medium text-amber-600 sm:px-4 sm:py-3 sm:text-sm">{formatCurrency(a.balance)}</td>
                         <td className="px-3 py-2.5 text-center sm:px-4 sm:py-3">
                           <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-medium sm:text-xs", getPaidStatusColor(a.status))}>{a.status || "—"}</span>
@@ -117,9 +141,11 @@ export default async function TeamDetailPage({
       {/* Output Assignments */}
       {output_expenses.length > 0 && (
         <div className="mt-6 sm:mt-8">
-          <h2 className="section-title mb-3 sm:mb-4">
-            Output Assignments <span className="text-xs font-normal text-gray-400 sm:text-sm">({output_expenses.length})</span>
-          </h2>
+          <div className="stat-card !p-3 !mb-4">
+            <h2 className="section-title !mb-0 text-base sm:text-lg">
+              Output Assignments <span className="text-xs font-normal opacity-60 sm:text-sm">({output_expenses.length})</span>
+            </h2>
+          </div>
           <div className="-mx-4 overflow-x-auto sm:mx-0">
             <div className="inline-block min-w-full px-4 sm:px-0">
               <div className="overflow-hidden rounded-lg border border-gray-200">
@@ -137,13 +163,13 @@ export default async function TeamDetailPage({
                   </thead>
                   <tbody className="divide-y divide-gray-50">
                     {output_expenses.map((o) => (
-                      <tr key={o.id} className="transition-colors hover:bg-gray-50">
+                      <tr key={o.id} className="transition-colors hover:bg-gray-50/50 dark:hover:bg-slate-800/30">
                         <td className="whitespace-nowrap px-3 py-2.5 sm:px-4 sm:py-3">
-                          <Link href={`/events/${o.event_id}`} className="text-xs font-medium text-brand-600 hover:underline sm:text-sm">{o.event_name}</Link>
+                          <Link href={`/events/${(o as any).event_display_id || (o as any).event_id}?from=team&memberId=${(member as any).display_id || (member as any).id}&fromName=${(member as any).full_name}`} className="text-xs font-medium text-brand-600 hover:underline sm:text-sm">{(o as any).event_name}</Link>
                         </td>
                         <td className="whitespace-nowrap px-3 py-2.5 text-xs text-gray-600 sm:px-4 sm:py-3 sm:text-sm">{o.deliverable}</td>
                         <td className="px-3 py-2.5 text-center text-xs text-gray-600 sm:px-4 sm:py-3 sm:text-sm">{o.quantity}</td>
-                        <td className="whitespace-nowrap px-3 py-2.5 text-right text-xs font-medium text-gray-900 sm:px-4 sm:py-3 sm:text-sm">{formatCurrency(o.total_amount)}</td>
+                        <td className="whitespace-nowrap px-3 py-2.5 text-right text-xs font-medium sm:px-4 sm:py-3 sm:text-sm">{formatCurrency(o.total_amount)}</td>
                         <td className="whitespace-nowrap px-3 py-2.5 text-right text-xs text-gray-600 sm:px-4 sm:py-3 sm:text-sm">{formatCurrency(o.advance_paid)}</td>
                         <td className="whitespace-nowrap px-3 py-2.5 text-right text-xs font-medium text-amber-600 sm:px-4 sm:py-3 sm:text-sm">{formatCurrency(o.balance)}</td>
                         <td className="px-3 py-2.5 text-center sm:px-4 sm:py-3">

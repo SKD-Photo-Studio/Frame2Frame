@@ -73,19 +73,19 @@ export function AddTeamMemberForm({ onSuccess }: { onSuccess: (m?: TeamListItem)
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="mb-1.5 block text-sm font-medium text-gray-700">Name *</label>
+        <label className="form-label">Name *</label>
         <input
           name="full_name"
           placeholder="e.g. Suresh Kumar"
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+          className="form-input"
         />
       </div>
 
       <div>
-        <label className="mb-1.5 block text-sm font-medium text-gray-700">Usual Role *</label>
+        <label className="form-label">Usual Role *</label>
         <select
           name="usual_role"
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+          className="form-select"
         >
           <option value="">Select a role...</option>
           {ROLES.map((r) => (
@@ -95,12 +95,12 @@ export function AddTeamMemberForm({ onSuccess }: { onSuccess: (m?: TeamListItem)
       </div>
 
       <div>
-        <label className="mb-1.5 block text-sm font-medium text-gray-700">Phone Number</label>
+        <label className="form-label">Phone Number</label>
         <input
           name="phone_number"
           type="tel"
           placeholder="e.g. 9001122334"
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+          className="form-input"
         />
       </div>
 
@@ -110,14 +110,14 @@ export function AddTeamMemberForm({ onSuccess }: { onSuccess: (m?: TeamListItem)
         <button
           type="button"
           onClick={() => onSuccess()}
-          className="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+          className="form-btn-secondary"
         >
           Cancel
         </button>
         <button
           type="submit"
           disabled={loading}
-          className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-700 disabled:opacity-50"
+          className="flex-1 rounded-xl bg-brand-600 py-3 text-sm font-semibold text-white hover:bg-brand-700 shadow-lg shadow-brand-600/20 disabled:opacity-50 transition-all"
         >
           {loading ? "Adding..." : "Add Member"}
         </button>

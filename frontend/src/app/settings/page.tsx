@@ -61,21 +61,23 @@ export default function SettingsPage() {
 
   return (
     <div className="max-w-3xl mx-auto py-8 px-4">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-          <Building2 className="h-6 w-6 text-brand-600" />
-          Workspace Settings
-        </h1>
-        <p className="text-sm text-gray-500 mt-1">
-          Manage your organization&apos;s branding and identity.
-        </p>
+      <div className="page-header">
+        <div>
+          <h1 className="page-title flex items-center gap-2">
+            <Building2 className="h-6 w-6 text-brand-600" />
+            Workspace Settings
+          </h1>
+          <p className="text-sm text-gray-500 mt-0.5">
+            Manage your organization&apos;s branding and identity.
+          </p>
+        </div>
       </div>
 
       <div className="space-y-6">
         {/* Branding Section */}
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-          <div className="border-b border-gray-100 bg-gray-50/50 px-6 py-4">
-            <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider">Branding</h2>
+        <div className="stat-card !p-0 overflow-hidden">
+          <div className="border-b px-6 py-4" style={{ borderColor: 'var(--border)', backgroundColor: 'color-mix(in srgb, var(--card), transparent 80%)' }}>
+            <h2 className="text-sm font-bold uppercase tracking-wider">Branding</h2>
           </div>
           <form onSubmit={handleUpdate} className="p-6 space-y-8">
             <div className="space-y-2">
@@ -85,7 +87,8 @@ export default function SettingsPage() {
                 value={tenant?.company_name || ""}
                 onChange={(e) => setTenant(prev => prev ? { ...prev, company_name: e.target.value } : null)}
                 placeholder="e.g. SKD Photo Studio"
-                className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+                className="w-full rounded-lg border px-4 py-2.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+                style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)' }}
                 required
               />
             </div>
@@ -97,7 +100,7 @@ export default function SettingsPage() {
               onUploadComplete={(url) => setTenant(prev => prev ? { ...prev, logo_url: url } : null)} 
             />
 
-            <div className="pt-4 flex items-center justify-between border-t border-gray-100">
+            <div className="pt-4 flex items-center justify-between border-t" style={{ borderColor: 'var(--border)' }}>
               {success && (
                 <p className="text-sm font-medium text-green-600">Settings saved successfully!</p>
               )}
@@ -114,30 +117,30 @@ export default function SettingsPage() {
         </div>
 
         {/* Admins Section */}
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-          <div className="border-b border-gray-100 bg-gray-50/50 px-6 py-4 flex items-center justify-between">
-            <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider flex items-center gap-2">
+        <div className="stat-card !p-0 overflow-hidden">
+          <div className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: 'var(--border)', backgroundColor: 'color-mix(in srgb, var(--card), transparent 80%)' }}>
+            <h2 className="text-sm font-bold uppercase tracking-wider flex items-center gap-2">
               <ShieldCheck className="h-4 w-4 text-brand-600" />
               Administrators
             </h2>
           </div>
-          <div className="p-6">
-            <div className="grid gap-4">
+          <div className="p-4 sm:p-6">
+            <div className="grid gap-5">
               {admins.map((admin) => (
-                <div key={admin.id} className="flex items-center justify-between p-4 rounded-lg border border-gray-100 bg-gray-50/30">
-                  <div className="flex items-center gap-4">
-                    <div className="h-10 w-10 rounded-full bg-brand-100 flex items-center justify-center text-brand-700 font-bold">
+                <div key={admin.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-lg border gap-4" style={{ borderColor: 'var(--border)', backgroundColor: 'color-mix(in srgb, var(--foreground), transparent 97%)' }}>
+                  <div className="flex items-center gap-4 min-w-0">
+                    <div className="h-10 w-10 rounded-full bg-brand-100 flex items-center justify-center text-brand-700 font-bold dark:bg-brand-900/30 dark:text-brand-400">
                       {admin.full_name?.charAt(0) || "A"}
                     </div>
                     <div>
-                      <h3 className="text-sm font-bold text-gray-900">{admin.full_name}</h3>
-                      <div className="flex items-center gap-1.5 text-xs text-gray-500 mt-0.5">
+                      <h3 className="text-sm font-bold">{admin.full_name}</h3>
+                      <div className="flex items-center gap-1.5 text-xs opacity-60 mt-0.5">
                         <Mail className="h-3 w-3" />
                         {admin.email}
                       </div>
                     </div>
                   </div>
-                  <span className="inline-flex items-center rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-medium text-brand-700 border border-brand-100">
+                  <span className="inline-flex items-center self-start sm:self-center rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-medium text-brand-700 border border-brand-100 flex-shrink-0">
                     Full Access
                   </span>
                 </div>

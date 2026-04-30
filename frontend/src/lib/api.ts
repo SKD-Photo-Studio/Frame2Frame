@@ -1,8 +1,8 @@
 import { createClient as createBrowserClient } from "./supabase.client";
 
-const API_BASE = typeof window !== "undefined" && window.location.hostname !== "localhost" 
-  ? "/api" 
-  : (process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001/api");
+const API_BASE = typeof window === 'undefined' 
+  ? (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000/api')
+  : '/api';
 
 async function getAuthToken() {
   if (typeof window !== 'undefined') {
@@ -11,8 +11,16 @@ async function getAuthToken() {
     return session?.access_token;
   }
   
-  // Server-side: use a safe way to check cookies without breaking the client bundle
-  return null;
+  // Server-side: Try to get session from cookies
+  try {
+    const { cookies } = await import('next/headers');
+    const cookieStore = await cookies();
+    // We can't easily get the access_token string from the cookie without parsing
+    // but we can just pass all cookies instead in fetchAPI.
+    return null;
+  } catch {
+    return null;
+  }
 }
 
 async function fetchAPI<T>(endpoint: string, options?: RequestInit & { token?: string }): Promise<T> {
@@ -24,6 +32,16 @@ async function fetchAPI<T>(endpoint: string, options?: RequestInit & { token?: s
 
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  // If on server, pass through the cookies from the incoming request
+  if (typeof window === 'undefined') {
+    try {
+      const { cookies } = await import('next/headers');
+      headers["Cookie"] = (await cookies()).toString();
+    } catch {
+      // Not in a request context (e.g. build time)
+    }
   }
 
   const res = await fetch(`${API_BASE}${endpoint}`, {
@@ -193,13 +211,7 @@ export interface DashboardResponse {
   team_balance: number;
   total_savings: number;
   recent_events: EventWithFinancials[];
-  upcoming_dates: {
-    date: string;
-    event_id: string;
-    event_type: string;
-    display_id: string;
-    client_name: string;
-  }[];
+  upcoming_events: EventWithFinancials[];
 }
 
 

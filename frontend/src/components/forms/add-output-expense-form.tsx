@@ -106,7 +106,7 @@ function AddOutputExpenseForm({ eventId, onSuccess }: { eventId: string; onSucce
       <div className="grid grid-cols-2 gap-4">
         <div>
           <div className="mb-1.5 flex items-center justify-between">
-            <label className="block text-sm font-medium text-gray-700">Team Member *</label>
+            <label className="form-label !mb-0">Team Member *</label>
             <button
               type="button"
               onClick={() => setShowAddMember(true)}
@@ -130,7 +130,7 @@ function AddOutputExpenseForm({ eventId, onSuccess }: { eventId: string; onSucce
           />
         </div>
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-gray-700">Role *</label>
+          <label className="form-label">Role *</label>
           <Combobox
             value={role}
             onChange={setRole}
@@ -149,7 +149,7 @@ function AddOutputExpenseForm({ eventId, onSuccess }: { eventId: string; onSucce
 
       <div className="grid grid-cols-2 gap-4">
         <div className="col-span-2 sm:col-span-1">
-          <label className="mb-1.5 block text-sm font-medium text-gray-700">Deliverable *</label>
+          <label className="form-label">Deliverable *</label>
           <Combobox
             value={deliverable}
             onChange={setDeliverable}
@@ -159,46 +159,46 @@ function AddOutputExpenseForm({ eventId, onSuccess }: { eventId: string; onSucce
           />
         </div>
         <div className="col-span-2 sm:col-span-1">
-          <label className="mb-1.5 block text-sm font-medium text-gray-700">Quantity</label>
-          <input name="quantity" type="number" min="1" defaultValue="1" className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500" />
+          <label className="form-label">Quantity</label>
+          <input name="quantity" type="number" min="1" defaultValue="1" className="form-input" />
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-6 sm:grid-cols-3">
         {/* Total */}
         <div>
-          <label className="mb-2 block text-sm font-semibold text-gray-700">Total (₹)</label>
+          <label className="form-label">Total (₹)</label>
           <input 
             name="total_amount" 
             type="number" 
             min="0" 
             placeholder="0" 
             onChange={(e) => setTotalAmount(Number(e.target.value))}
-            className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/10 transition-all font-medium" 
+            className="form-input" 
           />
         </div>
 
         {/* Advance */}
         <div>
-          <label className="mb-2 block text-sm font-semibold text-gray-700">Advance (₹)</label>
+          <label className="form-label">Advance (₹)</label>
           <input 
             name="advance_paid" 
             type="number" 
             min="0" 
             defaultValue="0" 
             onChange={(e) => setAdvancePaid(Number(e.target.value))}
-            className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/10 transition-all" 
+            className="form-input" 
           />
         </div>
 
         {/* Status Toggle (Standalone on mobile or 3rd col on desktop) */}
         <div className="col-span-2 sm:col-span-1">
-          <label className="mb-2 block text-sm font-semibold text-gray-700">Payment Status</label>
+          <label className="form-label">Payment Status</label>
           <div className={`flex h-[46px] items-center justify-center rounded-xl border px-4 text-[10px] font-bold uppercase tracking-wider transition-all ${
-            advancePaid > totalAmount ? "border-purple-200 bg-purple-600 text-white shadow-sm" :
-            advancePaid === totalAmount && totalAmount > 0 ? "border-green-200 bg-green-600 text-white shadow-sm" :
-            advancePaid > 0 ? "border-amber-200 bg-amber-500 text-white shadow-sm" :
-            "border-gray-200 bg-gray-600 text-white shadow-sm"
+            advancePaid > totalAmount ? "border-purple-200 dark:border-purple-900 bg-purple-600 dark:bg-purple-900 text-white shadow-sm" :
+            advancePaid === totalAmount && totalAmount > 0 ? "border-green-200 dark:border-green-900 bg-green-600 dark:bg-green-900 text-white shadow-sm" :
+            advancePaid > 0 ? "border-amber-200 dark:border-amber-900 bg-amber-500 dark:bg-amber-600 text-white shadow-sm" :
+            "border-gray-200 dark:border-gray-800 bg-gray-600 dark:bg-gray-700 text-white shadow-sm"
           }`}>
             {advancePaid > totalAmount ? "Overpaid" :
              advancePaid === totalAmount && totalAmount > 0 ? "Paid" : 
@@ -217,14 +217,14 @@ function AddOutputExpenseForm({ eventId, onSuccess }: { eventId: string; onSucce
         <button 
           type="button" 
           onClick={onSuccess} 
-          className="flex-1 rounded-xl border border-gray-200 bg-white py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
+          className="form-btn-secondary"
         >
           Cancel
         </button>
         <button 
           type="submit" 
           disabled={loading} 
-          className="flex-1 rounded-xl bg-brand-600 py-3 text-sm font-semibold text-white hover:bg-brand-700 shadow-lg shadow-brand-200 disabled:opacity-50 transition-all"
+          className="flex-1 rounded-xl bg-brand-600 py-3 text-sm font-semibold text-white hover:bg-brand-700 shadow-lg shadow-brand-600/20 disabled:opacity-50 transition-all"
         >
           {loading ? "Adding..." : "Add Output Expense"}
         </button>
