@@ -1,4 +1,4 @@
-name: Mirror to Production (Cloudflare)
+name: Mirror to Production (Manual)
 
 on:
   workflow_dispatch: # Mandatory Manual Gate
@@ -11,25 +11,21 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          persist-credentials: false
           
-      - name: Mirror to SKD-Photo-Studio
+      - name: Push to SKD Photo Studio
         env:
-          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+          SKD_TOKEN: ${{ secrets.SKD_PHOTO_STUDIO_REPO_TOKEN }}
         run: |
-          if [ -z "$DEPLOY_KEY" ]; then
-            echo "❌ DEPLOY_KEY is not set in GitHub Secrets."
+          if [ -z "$SKD_TOKEN" ]; then
+            echo "❌ SKD_PHOTO_STUDIO_REPO_TOKEN is not set in GitHub Secrets."
             exit 1
           fi
           
-          mkdir -p ~/.ssh
-          echo "$DEPLOY_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan github.com >> ~/.ssh/known_hosts
-          
-          # Add the production repository as a remote
-          git remote add production git@github.com:SKD-Photo-Studio/Frame2Frame.git
+          # Add the production repository as a remote with the access token
+          git remote add production "https://x-access-token:${SKD_TOKEN}@github.com/SKD-Photo-Studio/Frame2Frame.git"
           
           # Force push the main branch to the production repository
-          git push --force production main
+          git push production main --force
           
           echo "✅ Successfully mirrored to production repository."
