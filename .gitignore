@@ -48,7 +48,7 @@ Vercel REST API.md
 v_*.json
 diagnostics/
 # Internal AI Department Documentation (local-only)
-"Local Docs/"
+Local Docs/
 .gemini/
 
 # Scratch workspace
