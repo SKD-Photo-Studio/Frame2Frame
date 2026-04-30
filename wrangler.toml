@@ -1,10 +1,8 @@
 name = "frame2frame"
-compatibility_date = "2026-04-01"
+compatibility_date = "2026-04-30"
 compatibility_flags = ["nodejs_compat"]
 
-[pages_build_config]
-build_command = "cd frontend && npm install --legacy-peer-deps && npm run build:cf"
-build_output_directory = "frontend/.vercel/output/static"
+pages_build_output_dir = "frontend/.vercel/output/static"
 
 # Cloudflare R2 Buckets (Image Hosting)
 [[r2_buckets]]
