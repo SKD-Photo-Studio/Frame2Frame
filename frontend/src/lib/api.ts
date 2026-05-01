@@ -1,8 +1,21 @@
 import { createClient as createBrowserClient } from "./supabase.client";
 
-const API_BASE = typeof window === 'undefined' 
-  ? (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000/api')
-  : '/api';
+async function getApiBase() {
+  if (typeof window !== 'undefined') return '/api';
+  try {
+    const { headers } = await import('next/headers');
+    const cookieStore = await headers();
+    const host = cookieStore.get('host');
+    if (host) {
+      const protocol = host.startsWith('localhost') || host.startsWith('127.0.0.1') ? 'http' : 'https';
+      return `${protocol}://${host}/api`;
+    }
+  } catch {
+    // Fallback
+  }
+  return process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000/api';
+}
+
 
 async function getAuthToken() {
   if (typeof window !== 'undefined') {
@@ -44,7 +57,8 @@ async function fetchAPI<T>(endpoint: string, options?: RequestInit & { token?: s
     }
   }
 
-  const res = await fetch(`${API_BASE}${endpoint}`, {
+  const apiBase = await getApiBase();
+  const res = await fetch(`${apiBase}${endpoint}`, {
     ...options,
     headers,
     cache: "no-store",
@@ -302,7 +316,8 @@ export const api = {
 
   bulk: {
     getTemplate: async (token?: string) => {
-      const res = await fetch(`${API_BASE}/bulk/template`, {
+      const apiBase = await getApiBase();
+      const res = await fetch(`${apiBase}/bulk/template`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error("Failed to download template");
@@ -311,7 +326,8 @@ export const api = {
     upload: async (file: File, token?: string) => {
       const formData = new FormData();
       formData.append("file", file);
-      const res = await fetch(`${API_BASE}/bulk/upload`, {
+      const apiBase = await getApiBase();
+      const res = await fetch(`${apiBase}/bulk/upload`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: formData,
@@ -323,7 +339,8 @@ export const api = {
       return res.json();
     },
     exportAll: async (token?: string) => {
-      const res = await fetch(`${API_BASE}/bulk/export`, {
+      const apiBase = await getApiBase();
+      const res = await fetch(`${apiBase}/bulk/export`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error("Failed to export data");
