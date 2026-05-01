@@ -9,5 +9,7 @@ pages_build_output_dir = "frontend/.vercel/output/static"
 # binding = "PHOTO_ASSETS"
 # bucket_name = "skd-photo-assets"
 
-# Environment Variables should be managed via the Cloudflare Dashboard for security.
-
+# Public Environment Variables (Managed via wrangler.toml)
+[vars]
+NEXT_PUBLIC_SUPABASE_URL = "https://nsatybyqtmkrsitzotry.supabase.co"
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY = "sb_publishable_o7aR7olNbrkv93fhxFH7Mw_dBCRVZp4"
