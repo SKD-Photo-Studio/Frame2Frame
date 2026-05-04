@@ -8,26 +8,53 @@ import { getInitials } from "@/lib/utils";
 
 export default function ClientsList({ initialClients }: { initialClients: ClientListItem[] }) {
   const [query, setQuery] = useState("");
+  const [sortBy, setSortBy] = useState<"name-asc" | "name-desc" | "events-desc" | "events-asc">("name-asc");
 
-  const filteredClients = initialClients.filter(c => 
-    c.client_name.toLowerCase().includes(query.toLowerCase()) || 
-    c.phone_number.includes(query)
-  );
+  const filteredClients = initialClients
+    .filter(c => 
+      c.client_name.toLowerCase().includes(query.toLowerCase()) || 
+      (c.phone_number || "").includes(query)
+    )
+    .sort((a, b) => {
+      if (sortBy === "name-asc") return a.client_name.localeCompare(b.client_name);
+      if (sortBy === "name-desc") return b.client_name.localeCompare(a.client_name);
+      if (sortBy === "events-desc") return (b.event_count || 0) - (a.event_count || 0);
+      if (sortBy === "events-asc") return (a.event_count || 0) - (b.event_count || 0);
+      return 0;
+    });
 
   return (
     <>
-      <div className="search-card mb-6 max-w-md relative overflow-hidden">
-        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-          <Search className="h-4 w-4 opacity-40" />
+      <div className="mb-6 flex flex-col sm:flex-row gap-3 sm:items-center justify-between">
+        <div className="search-card max-w-md w-full relative overflow-hidden">
+          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+            <Search className="h-4 w-4 opacity-40" />
+          </div>
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search clients by name or phone..."
+            className="block w-full border-0 bg-transparent py-2.5 pl-10 pr-3 text-sm focus:ring-0 sm:text-sm sm:leading-6"
+            style={{ color: 'var(--foreground)' }}
+          />
         </div>
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search clients by name or phone..."
-          className="block w-full border-0 bg-transparent py-2.5 pl-10 pr-3 text-sm focus:ring-0 sm:text-sm sm:leading-6"
-          style={{ color: 'var(--foreground)' }}
-        />
+
+        <div className="flex items-center gap-2">
+          <label htmlFor="sortClients" className="text-xs font-medium opacity-60">Sort By:</label>
+          <select
+            id="sortClients"
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as any)}
+            className="block rounded-lg border border-gray-200 bg-white dark:bg-gray-900 dark:border-gray-700 py-1.5 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500"
+            style={{ color: 'var(--foreground)' }}
+          >
+            <option value="name-asc">Name (A - Z)</option>
+            <option value="name-desc">Name (Z - A)</option>
+            <option value="events-desc">Events Booked (High - Low)</option>
+            <option value="events-asc">Events Booked (Low - High)</option>
+          </select>
+        </div>
       </div>
 
       {filteredClients.length === 0 ? (

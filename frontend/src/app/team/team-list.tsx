@@ -19,27 +19,54 @@ const roleColors: Record<string, string> = {
 
 export default function TeamList({ initialMembers }: { initialMembers: TeamListItem[] }) {
   const [query, setQuery] = useState("");
+  const [sortBy, setSortBy] = useState<"earnings-desc" | "earnings-asc" | "name-asc" | "name-desc">("earnings-desc");
 
-  const filteredMembers = initialMembers.filter(m => 
-    m.full_name.toLowerCase().includes(query.toLowerCase()) || 
-    m.usual_role.toLowerCase().includes(query.toLowerCase()) ||
-    m.phone_number?.includes(query)
-  );
+  const filteredMembers = initialMembers
+    .filter(m => 
+      m.full_name.toLowerCase().includes(query.toLowerCase()) || 
+      m.usual_role.toLowerCase().includes(query.toLowerCase()) ||
+      (m.phone_number || "").includes(query)
+    )
+    .sort((a, b) => {
+      if (sortBy === "earnings-desc") return (b.total_earnings || 0) - (a.total_earnings || 0);
+      if (sortBy === "earnings-asc") return (a.total_earnings || 0) - (b.total_earnings || 0);
+      if (sortBy === "name-asc") return a.full_name.localeCompare(b.full_name);
+      if (sortBy === "name-desc") return b.full_name.localeCompare(a.full_name);
+      return 0;
+    });
 
   return (
     <>
-      <div className="search-card mb-6 max-w-md relative overflow-hidden">
-        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-          <Search className="h-4 w-4 opacity-40" />
+      <div className="mb-6 flex flex-col sm:flex-row gap-3 sm:items-center justify-between">
+        <div className="search-card max-w-md w-full relative overflow-hidden">
+          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+            <Search className="h-4 w-4 opacity-40" />
+          </div>
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search team by name, role or phone..."
+            className="block w-full border-0 bg-transparent py-2.5 pl-10 pr-3 text-sm focus:ring-0 sm:text-sm sm:leading-6"
+            style={{ color: 'var(--foreground)' }}
+          />
         </div>
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search team by name, role or phone..."
-          className="block w-full border-0 bg-transparent py-2.5 pl-10 pr-3 text-sm focus:ring-0 sm:text-sm sm:leading-6"
-          style={{ color: 'var(--foreground)' }}
-        />
+
+        <div className="flex items-center gap-2">
+          <label htmlFor="sortTeam" className="text-xs font-medium opacity-60">Sort By:</label>
+          <select
+            id="sortTeam"
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as any)}
+            className="block rounded-lg border border-gray-200 bg-white dark:bg-gray-900 dark:border-gray-700 py-1.5 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500"
+            style={{ color: 'var(--foreground)' }}
+          >
+            <option value="earnings-desc">Earnings (High - Low)</option>
+            <option value="earnings-asc">Earnings (Low - High)</option>
+            <option value="name-asc">Name (A - Z)</option>
+            <option value="name-desc">Name (Z - A)</option>
+          </select>
+        </div>
       </div>
 
       {filteredMembers.length === 0 ? (

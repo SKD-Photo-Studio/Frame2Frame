@@ -8,28 +8,62 @@ import { formatCurrency, getInitials, getEventTypeColor, cn } from "@/lib/utils"
 
 export default function EventsList({ initialEvents }: { initialEvents: EventWithFinancials[] }) {
   const [query, setQuery] = useState("");
+  const [sortBy, setSortBy] = useState<"date-desc" | "date-asc" | "package-desc" | "savings-desc">("date-desc");
 
-  const filteredEvents = initialEvents.filter(e => 
-    e.event_type.toLowerCase().includes(query.toLowerCase()) || 
-    e.client_name.toLowerCase().includes(query.toLowerCase()) ||
-    e.venue?.toLowerCase().includes(query.toLowerCase()) ||
-    e.city?.toLowerCase().includes(query.toLowerCase())
-  );
+  const parseDate = (dStr: string) => {
+    if (!dStr) return 0;
+    const first = dStr.split(",")[0].trim();
+    const parsed = Date.parse(first);
+    return isNaN(parsed) ? 0 : parsed;
+  };
+
+  const filteredEvents = initialEvents
+    .filter(e => 
+      e.event_type.toLowerCase().includes(query.toLowerCase()) || 
+      e.client_name.toLowerCase().includes(query.toLowerCase()) ||
+      (e.venue || "").toLowerCase().includes(query.toLowerCase()) ||
+      (e.city || "").toLowerCase().includes(query.toLowerCase())
+    )
+    .sort((a, b) => {
+      if (sortBy === "date-desc") return parseDate(b.date_string) - parseDate(a.date_string);
+      if (sortBy === "date-asc") return parseDate(a.date_string) - parseDate(b.date_string);
+      if (sortBy === "package-desc") return (b.package_value || 0) - (a.package_value || 0);
+      if (sortBy === "savings-desc") return (b.savings || 0) - (a.savings || 0);
+      return 0;
+    });
 
   return (
     <>
-      <div className="search-card mb-6 max-w-md relative overflow-hidden">
-        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-          <Search className="h-4 w-4 opacity-40" />
+      <div className="mb-6 flex flex-col sm:flex-row gap-3 sm:items-center justify-between">
+        <div className="search-card max-w-md w-full relative overflow-hidden">
+          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+            <Search className="h-4 w-4 opacity-40" />
+          </div>
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search by event type, client, venue, city..."
+            className="block w-full border-0 bg-transparent py-2.5 pl-10 pr-3 text-sm focus:ring-0 sm:text-sm sm:leading-6"
+            style={{ color: 'var(--foreground)' }}
+          />
         </div>
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search by event type, client, venue, city..."
-          className="block w-full border-0 bg-transparent py-2.5 pl-10 pr-3 text-sm focus:ring-0 sm:text-sm sm:leading-6"
-          style={{ color: 'var(--foreground)' }}
-        />
+
+        <div className="flex items-center gap-2">
+          <label htmlFor="sortEvents" className="text-xs font-medium opacity-60">Sort By:</label>
+          <select
+            id="sortEvents"
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as any)}
+            className="block rounded-lg border border-gray-200 bg-white dark:bg-gray-900 dark:border-gray-700 py-1.5 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-brand-500"
+            style={{ color: 'var(--foreground)' }}
+          >
+            <option value="date-desc">Latest to Oldest</option>
+            <option value="date-asc">Oldest to Latest</option>
+            <option value="package-desc">Package Value (High - Low)</option>
+            <option value="savings-desc">Savings (High - Low)</option>
+          </select>
+        </div>
       </div>
 
       {filteredEvents.length === 0 ? (

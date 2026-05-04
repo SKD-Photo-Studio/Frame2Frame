@@ -21,7 +21,7 @@ export async function POST(request: Request) {
       const teamUpdates = teamRows.map(row => ({
         display_id: String(row["Display ID"]).trim(),
         full_name: String(row["Full Name"]).trim(),
-        email: row["Email"] && String(row["Email"]).trim() !== "" ? String(row["Email"]).trim() : `${String(row["Display ID"]).trim()}@frame2frame.internal`,
+        email: row["Email"] && String(row["Email"]).trim() !== "" ? String(row["Email"]).trim() : null,
         phone_number: row["Phone"] && String(row["Phone"]).trim() !== "" ? String(row["Phone"]).trim() : "",
         usual_role: String(row["Usual Role"] || "").trim()
       }));
@@ -140,12 +140,28 @@ export async function POST(request: Request) {
         payment_date: row["Date"] && String(row["Date"]).trim() !== "" ? String(row["Date"]).trim() : null,
       };
     }).filter(Boolean);
+
     if (paymentRows.length > 0) {
-      const { error } = await supabaseAdmin.from("client_payments").insert(paymentRows as any);
-      if (error) {
-        throw new Error(`Database error processing Payments: ${error.message}`);
+      const { data: existingPayments } = await supabaseAdmin
+        .from("client_payments")
+        .select("event_id, installment_type, amount, payment_date")
+        .eq("tenant_id", tenantId);
+      
+      const existingPaymentKeys = new Set(
+        existingPayments?.map(p => `${p.event_id}_${p.installment_type}_${p.amount}_${p.payment_date}`) || []
+      );
+
+      const filteredPayments = paymentRows.filter(p => {
+        return !existingPaymentKeys.has(`${p!.event_id}_${p!.installment_type}_${p!.amount}_${p!.payment_date}`);
+      });
+
+      if (filteredPayments.length > 0) {
+        const { error } = await supabaseAdmin.from("client_payments").insert(filteredPayments as any);
+        if (error) {
+          throw new Error(`Database error processing Payments: ${error.message}`);
+        }
       }
-      stats.payments = (paymentRows as any[]).length;
+      stats.payments = filteredPayments.length;
     }
 
     // 5. Process Artist Expenses
@@ -168,12 +184,28 @@ export async function POST(request: Request) {
         advance_paid: Number(row["Advance"]) || 0,
       };
     }).filter(Boolean);
+
     if (artistRows.length > 0) {
-      const { error } = await supabaseAdmin.from("artist_expenses").insert(artistRows as any);
-      if (error) {
-        throw new Error(`Database error processing Artist Expenses: ${error.message}`);
+      const { data: existingArtistExpenses } = await supabaseAdmin
+        .from("artist_expenses")
+        .select("event_id, user_id, assignment_role")
+        .eq("tenant_id", tenantId);
+      
+      const existingArtistKeys = new Set(
+        existingArtistExpenses?.map(a => `${a.event_id}_${a.user_id}_${a.assignment_role}`) || []
+      );
+
+      const filteredArtists = artistRows.filter(a => {
+        return !existingArtistKeys.has(`${a!.event_id}_${a!.user_id}_${a!.assignment_role}`);
+      });
+
+      if (filteredArtists.length > 0) {
+        const { error } = await supabaseAdmin.from("artist_expenses").insert(filteredArtists as any);
+        if (error) {
+          throw new Error(`Database error processing Artist Expenses: ${error.message}`);
+        }
       }
-      stats.artistExpenses = (artistRows as any[]).length;
+      stats.artistExpenses = filteredArtists.length;
     }
 
     // 6. Process Output Expenses
@@ -193,12 +225,28 @@ export async function POST(request: Request) {
         advance_paid: Number(row["Advance"]) || 0,
       };
     }).filter(Boolean);
+
     if (outputRows.length > 0) {
-      const { error } = await supabaseAdmin.from("output_expenses").insert(outputRows as any);
-      if (error) {
-        throw new Error(`Database error processing Output Expenses: ${error.message}`);
+      const { data: existingOutputExpenses } = await supabaseAdmin
+        .from("output_expenses")
+        .select("event_id, user_id, assignment_role, deliverable")
+        .eq("tenant_id", tenantId);
+      
+      const existingOutputKeys = new Set(
+        existingOutputExpenses?.map(o => `${o.event_id}_${o.user_id}_${o.assignment_role}_${o.deliverable}`) || []
+      );
+
+      const filteredOutputs = outputRows.filter(o => {
+        return !existingOutputKeys.has(`${o!.event_id}_${o!.user_id}_${o!.assignment_role}_${o!.deliverable}`);
+      });
+
+      if (filteredOutputs.length > 0) {
+        const { error } = await supabaseAdmin.from("output_expenses").insert(filteredOutputs as any);
+        if (error) {
+          throw new Error(`Database error processing Output Expenses: ${error.message}`);
+        }
       }
-      stats.outputExpenses = (outputRows as any[]).length;
+      stats.outputExpenses = filteredOutputs.length;
     }
 
     return NextResponse.json({ message: "Upload processed successfully", stats });

@@ -97,92 +97,84 @@ export default async function TeamDetailPage({
 
       {/* Artist Assignments */}
       {artist_expenses.length > 0 && (
-        <div className="mt-6 sm:mt-8">
-          <div className="stat-card !p-3 !mb-4">
+        <div className="mt-6 sm:mt-8 stat-card !p-0 overflow-hidden">
+          <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3 dark:border-gray-800 sm:px-6 sm:py-4" style={{ backgroundColor: 'color-mix(in srgb, var(--card), transparent 40%)' }}>
             <h2 className="section-title !mb-0 text-base sm:text-lg">
-              Artist Assignments <span className="text-xs font-normal opacity-60 sm:text-sm">({artist_expenses.length})</span>
+              Artist Assignments <span className="ml-1 text-xs font-normal opacity-40 sm:text-sm">({artist_expenses.length})</span>
             </h2>
           </div>
-          <div className="-mx-4 overflow-x-auto sm:mx-0">
-            <div className="inline-block min-w-full px-4 sm:px-0">
-              <div className="overflow-hidden rounded-lg border border-gray-200">
-                <table className="min-w-[640px] w-full text-sm sm:min-w-0">
-                  <thead>
-                    <tr className="border-b border-gray-100 bg-gray-50/80">
-                      <th className="px-3 py-2.5 text-left text-xs font-medium opacity-60 sm:px-4 sm:py-3 sm:text-sm">Event</th>
-                      <th className="px-3 py-2.5 text-left text-xs font-medium opacity-60 sm:px-4 sm:py-3 sm:text-sm">Role</th>
-                      <th className="px-3 py-2.5 text-right text-xs font-medium opacity-60 sm:px-4 sm:py-3 sm:text-sm">Total</th>
-                      <th className="px-3 py-2.5 text-right text-xs font-medium opacity-60 sm:px-4 sm:py-3 sm:text-sm">Advance</th>
-                      <th className="px-3 py-2.5 text-right text-xs font-medium opacity-60 sm:px-4 sm:py-3 sm:text-sm">Balance</th>
-                      <th className="px-3 py-2.5 text-center text-xs font-medium opacity-60 sm:px-4 sm:py-3 sm:text-sm">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-50">
-                    {artist_expenses.map((a) => (
-                      <tr key={a.id} className="transition-colors hover:bg-gray-50/50 dark:hover:bg-slate-800/30">
-                        <td className="whitespace-nowrap px-3 py-2.5 sm:px-4 sm:py-3">
-                          <Link href={`/events/${(a as any).event_display_id || (a as any).event_id}?from=team&memberId=${(member as any).display_id || (member as any).id}&fromName=${(member as any).full_name}`} className="text-xs font-medium text-brand-600 hover:underline sm:text-sm">{(a as any).event_name}</Link>
-                        </td>
-                        <td className="whitespace-nowrap px-3 py-2.5 text-xs opacity-70 sm:px-4 sm:py-3 sm:text-sm">{a.assignment_role}</td>
-                        <td className="whitespace-nowrap px-3 py-2.5 text-right text-xs font-medium sm:px-4 sm:py-3 sm:text-sm">{formatCurrency(a.total_amount)}</td>
-                        <td className="whitespace-nowrap px-3 py-2.5 text-right text-xs opacity-70 sm:px-4 sm:py-3 sm:text-sm">{formatCurrency(a.advance_paid)}</td>
-                        <td className="whitespace-nowrap px-3 py-2.5 text-right text-xs font-medium text-amber-600 sm:px-4 sm:py-3 sm:text-sm">{formatCurrency(a.balance)}</td>
-                        <td className="px-3 py-2.5 text-center sm:px-4 sm:py-3">
-                          <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-medium sm:text-xs", getPaidStatusColor(a.status))}>{a.status || "—"}</span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-gray-100 bg-gray-50/50 dark:bg-slate-800/50">
+                  <th className="px-4 py-3 text-left text-xs font-medium opacity-60 sm:text-sm">Event</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium opacity-60 sm:text-sm">Role</th>
+                  <th className="px-4 py-3 text-right text-xs font-medium opacity-60 sm:text-sm">Total</th>
+                  <th className="px-4 py-3 text-right text-xs font-medium opacity-60 sm:text-sm">Advance</th>
+                  <th className="px-4 py-3 text-right text-xs font-medium opacity-60 sm:text-sm">Balance</th>
+                  <th className="px-4 py-3 text-center text-xs font-medium opacity-60 sm:text-sm">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
+                {artist_expenses.map((a) => (
+                  <tr key={a.id} className="transition-colors hover:bg-gray-50/50 dark:hover:bg-slate-800/30">
+                    <td className="whitespace-nowrap px-4 py-3">
+                      <Link href={`/events/${(a as any).event_display_id || (a as any).event_id}?from=team&memberId=${(member as any).display_id || (member as any).id}&fromName=${(member as any).full_name}`} className="font-medium text-brand-600 hover:underline">{(a as any).event_name}</Link>
+                    </td>
+                    <td className="whitespace-nowrap px-4 py-3 text-xs opacity-70 sm:text-sm">{a.assignment_role}</td>
+                    <td className="whitespace-nowrap px-4 py-3 text-right text-xs font-medium sm:text-sm">{formatCurrency(a.total_amount)}</td>
+                    <td className="whitespace-nowrap px-4 py-3 text-right text-xs opacity-70 sm:text-sm">{formatCurrency(a.advance_paid)}</td>
+                    <td className="whitespace-nowrap px-4 py-3 text-right text-xs font-medium text-amber-600 sm:text-sm">{formatCurrency(a.balance)}</td>
+                    <td className="px-4 py-3 text-center">
+                      <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-medium sm:text-xs", getPaidStatusColor(a.status))}>{a.status || "—"}</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       )}
 
       {/* Output Assignments */}
       {output_expenses.length > 0 && (
-        <div className="mt-6 sm:mt-8">
-          <div className="stat-card !p-3 !mb-4">
+        <div className="mt-6 sm:mt-8 stat-card !p-0 overflow-hidden">
+          <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3 dark:border-gray-800 sm:px-6 sm:py-4" style={{ backgroundColor: 'color-mix(in srgb, var(--card), transparent 40%)' }}>
             <h2 className="section-title !mb-0 text-base sm:text-lg">
-              Output Assignments <span className="text-xs font-normal opacity-60 sm:text-sm">({output_expenses.length})</span>
+              Output Assignments <span className="ml-1 text-xs font-normal opacity-40 sm:text-sm">({output_expenses.length})</span>
             </h2>
           </div>
-          <div className="-mx-4 overflow-x-auto sm:mx-0">
-            <div className="inline-block min-w-full px-4 sm:px-0">
-              <div className="overflow-hidden rounded-lg border border-gray-200">
-                <table className="min-w-[700px] w-full text-sm sm:min-w-0">
-                  <thead>
-                    <tr className="border-b border-gray-100 bg-gray-50/80">
-                      <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 sm:px-4 sm:py-3 sm:text-sm">Event</th>
-                      <th className="px-3 py-2.5 text-left text-xs font-medium text-gray-500 sm:px-4 sm:py-3 sm:text-sm">Deliverable</th>
-                      <th className="px-3 py-2.5 text-center text-xs font-medium text-gray-500 sm:px-4 sm:py-3 sm:text-sm">Qty</th>
-                      <th className="px-3 py-2.5 text-right text-xs font-medium text-gray-500 sm:px-4 sm:py-3 sm:text-sm">Total</th>
-                      <th className="px-3 py-2.5 text-right text-xs font-medium text-gray-500 sm:px-4 sm:py-3 sm:text-sm">Advance</th>
-                      <th className="px-3 py-2.5 text-right text-xs font-medium text-gray-500 sm:px-4 sm:py-3 sm:text-sm">Balance</th>
-                      <th className="px-3 py-2.5 text-center text-xs font-medium text-gray-500 sm:px-4 sm:py-3 sm:text-sm">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-50">
-                    {output_expenses.map((o) => (
-                      <tr key={o.id} className="transition-colors hover:bg-gray-50/50 dark:hover:bg-slate-800/30">
-                        <td className="whitespace-nowrap px-3 py-2.5 sm:px-4 sm:py-3">
-                          <Link href={`/events/${(o as any).event_display_id || (o as any).event_id}?from=team&memberId=${(member as any).display_id || (member as any).id}&fromName=${(member as any).full_name}`} className="text-xs font-medium text-brand-600 hover:underline sm:text-sm">{(o as any).event_name}</Link>
-                        </td>
-                        <td className="whitespace-nowrap px-3 py-2.5 text-xs text-gray-600 sm:px-4 sm:py-3 sm:text-sm">{o.deliverable}</td>
-                        <td className="px-3 py-2.5 text-center text-xs text-gray-600 sm:px-4 sm:py-3 sm:text-sm">{o.quantity}</td>
-                        <td className="whitespace-nowrap px-3 py-2.5 text-right text-xs font-medium sm:px-4 sm:py-3 sm:text-sm">{formatCurrency(o.total_amount)}</td>
-                        <td className="whitespace-nowrap px-3 py-2.5 text-right text-xs text-gray-600 sm:px-4 sm:py-3 sm:text-sm">{formatCurrency(o.advance_paid)}</td>
-                        <td className="whitespace-nowrap px-3 py-2.5 text-right text-xs font-medium text-amber-600 sm:px-4 sm:py-3 sm:text-sm">{formatCurrency(o.balance)}</td>
-                        <td className="px-3 py-2.5 text-center sm:px-4 sm:py-3">
-                          <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-medium sm:text-xs", getPaidStatusColor(o.status))}>{o.status || "—"}</span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-gray-100 bg-gray-50/50 dark:bg-slate-800/50">
+                  <th className="px-4 py-3 text-left text-xs font-medium opacity-60 sm:text-sm">Event</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium opacity-60 sm:text-sm">Deliverable</th>
+                  <th className="px-4 py-3 text-center text-xs font-medium opacity-60 sm:text-sm">Qty</th>
+                  <th className="px-4 py-3 text-right text-xs font-medium opacity-60 sm:text-sm">Total</th>
+                  <th className="px-4 py-3 text-right text-xs font-medium opacity-60 sm:text-sm">Advance</th>
+                  <th className="px-4 py-3 text-right text-xs font-medium opacity-60 sm:text-sm">Balance</th>
+                  <th className="px-4 py-3 text-center text-xs font-medium opacity-60 sm:text-sm">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
+                {output_expenses.map((o) => (
+                  <tr key={o.id} className="transition-colors hover:bg-gray-50/50 dark:hover:bg-slate-800/30">
+                    <td className="whitespace-nowrap px-4 py-3">
+                      <Link href={`/events/${(o as any).event_display_id || (o as any).event_id}?from=team&memberId=${(member as any).display_id || (member as any).id}&fromName=${(member as any).full_name}`} className="font-medium text-brand-600 hover:underline">{(o as any).event_name}</Link>
+                    </td>
+                    <td className="whitespace-nowrap px-4 py-3 text-xs opacity-70 sm:text-sm">{o.deliverable}</td>
+                    <td className="px-4 py-3 text-center text-xs opacity-70 sm:text-sm">{o.quantity}</td>
+                    <td className="whitespace-nowrap px-4 py-3 text-right text-xs font-medium sm:text-sm">{formatCurrency(o.total_amount)}</td>
+                    <td className="whitespace-nowrap px-4 py-3 text-right text-xs opacity-70 sm:text-sm">{formatCurrency(o.advance_paid)}</td>
+                    <td className="whitespace-nowrap px-4 py-3 text-right text-xs font-medium text-amber-600 sm:text-sm">{formatCurrency(o.balance)}</td>
+                    <td className="px-4 py-3 text-center">
+                      <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-medium sm:text-xs", getPaidStatusColor(o.status))}>{o.status || "—"}</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       )}
