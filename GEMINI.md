@@ -10,6 +10,7 @@
 - **Multi-Tenancy**: Currently optimized for **Single-Studio (SKD)**.
 - **Tenant Isolation**: Enforced via `tenant_id` column in all tables. Logic is centralized in `src/lib/supabase.server.ts` -> `getDefaultTenantId()`.
 - **Authentication**: Managed via `@supabase/ssr`. Cookies are processed through the `createServerSupabaseClient` utility.
+- **AI Behavior**: Don't assume, ask. Always request clarification on any ambiguity.
 
 ## Deployment Status
 - **Target**: Cloudflare Pages via Git-based CI/CD.

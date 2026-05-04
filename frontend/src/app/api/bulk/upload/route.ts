@@ -21,8 +21,8 @@ export async function POST(request: Request) {
       const teamUpdates = teamRows.map(row => ({
         display_id: String(row["Display ID"]).trim(),
         full_name: String(row["Full Name"]).trim(),
-        email: String(row["Email"] || "").trim(),
-        phone_number: String(row["Phone"] || "").trim(),
+        email: row["Email"] && String(row["Email"]).trim() !== "" ? String(row["Email"]).trim() : `${String(row["Display ID"]).trim()}@frame2frame.internal`,
+        phone_number: row["Phone"] && String(row["Phone"]).trim() !== "" ? String(row["Phone"]).trim() : "",
         usual_role: String(row["Usual Role"] || "").trim()
       }));
       
@@ -37,14 +37,28 @@ export async function POST(request: Request) {
 
       if (upsertedUsers) {
         stats.team = teamRows.length;
-        const memberships = upsertedUsers.map(u => ({
-          user_id: u.id,
-          tenant_id: tenantId,
-          role: "MEMBER"
-        }));
-        const { error: mError } = await supabaseAdmin.from("workspace_memberships").upsert(memberships, { onConflict: "user_id, tenant_id" });
-        if (mError) {
-          throw new Error(`Database error setting memberships: ${mError.message}`);
+        
+        const { data: existingMemberships } = await supabaseAdmin
+          .from("workspace_memberships")
+          .select("user_id")
+          .eq("tenant_id", tenantId);
+        
+        const existingUserIds = new Set(existingMemberships?.map(m => m.user_id) || []);
+
+        const memberships = upsertedUsers
+          .map(u => u.id)
+          .filter(id => !existingUserIds.has(id))
+          .map(id => ({
+            user_id: id,
+            tenant_id: tenantId,
+            role: "MEMBER"
+          }));
+
+        if (memberships.length > 0) {
+          const { error: mError } = await supabaseAdmin.from("workspace_memberships").insert(memberships);
+          if (mError) {
+            throw new Error(`Database error setting memberships: ${mError.message}`);
+          }
         }
       }
     }
@@ -56,11 +70,11 @@ export async function POST(request: Request) {
         tenant_id: tenantId,
         display_id: String(row["Display ID"]).trim(),
         client_name: String(row["Client Name"]).trim(),
-        phone_number: String(row["Phone"] || "").trim(),
-        email: String(row["Email"] || "").trim(),
+        phone_number: row["Phone"] && String(row["Phone"]).trim() !== "" ? String(row["Phone"]).trim() : null,
+        email: row["Email"] && String(row["Email"]).trim() !== "" ? String(row["Email"]).trim() : null,
         notes: String(row["Notes"] || "").trim()
       }));
-      const { error } = await supabaseAdmin.from("clients_master").upsert(clientUpdates, { onConflict: "display_id, tenant_id" });
+      const { error } = await supabaseAdmin.from("clients_master").upsert(clientUpdates, { onConflict: "display_id" });
       if (error) {
         throw new Error(`Database error processing Clients: ${error.message}`);
       }
@@ -99,7 +113,7 @@ export async function POST(request: Request) {
       }).filter(Boolean);
 
       if (eventUpdates.length > 0) {
-        const { error } = await supabaseAdmin.from("events_master").upsert(eventUpdates as any, { onConflict: "display_id, tenant_id" });
+        const { error } = await supabaseAdmin.from("events_master").upsert(eventUpdates as any, { onConflict: "display_id" });
         if (error) {
           throw new Error(`Database error processing Events: ${error.message}`);
         }
@@ -123,7 +137,7 @@ export async function POST(request: Request) {
         amount: Number(row["Amount"]) || 0,
         payment_method: String(row["Method"] || "Cash").trim(),
         transaction_id: String(row["Transaction ID"] || "").trim(),
-        payment_date: row["Date"]
+        payment_date: row["Date"] && String(row["Date"]).trim() !== "" ? String(row["Date"]).trim() : null,
       };
     }).filter(Boolean);
     if (paymentRows.length > 0) {
@@ -146,8 +160,8 @@ export async function POST(request: Request) {
         user_id: userId,
         assignment_role: String(row["Role"] || "").trim(),
         pay_type: String(row["Pay Type"] || "").trim(),
-        date_start: row["Start Date"],
-        date_end: row["End Date"],
+        date_start: row["Start Date"] && String(row["Start Date"]).trim() !== "" ? String(row["Start Date"]).trim() : null,
+        date_end: row["End Date"] && String(row["End Date"]).trim() !== "" ? String(row["End Date"]).trim() : null,
         no_of_days: Number(row["Days"]) || 1,
         per_day_rate: Number(row["Rate"]) || 0,
         total_amount: Number(row["Total"]) || 0,
