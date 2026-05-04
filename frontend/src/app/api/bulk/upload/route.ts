@@ -31,14 +31,21 @@ export async function POST(request: Request) {
         .upsert(teamUpdates, { onConflict: "display_id" })
         .select("id");
 
-      if (!error && upsertedUsers) {
+      if (error) {
+        throw new Error(`Database error processing Team: ${error.message}`);
+      }
+
+      if (upsertedUsers) {
         stats.team = teamRows.length;
         const memberships = upsertedUsers.map(u => ({
           user_id: u.id,
           tenant_id: tenantId,
           role: "MEMBER"
         }));
-        await supabaseAdmin.from("workspace_memberships").upsert(memberships, { onConflict: "user_id, tenant_id" });
+        const { error: mError } = await supabaseAdmin.from("workspace_memberships").upsert(memberships, { onConflict: "user_id, tenant_id" });
+        if (mError) {
+          throw new Error(`Database error setting memberships: ${mError.message}`);
+        }
       }
     }
 
@@ -54,13 +61,19 @@ export async function POST(request: Request) {
         notes: String(row["Notes"] || "").trim()
       }));
       const { error } = await supabaseAdmin.from("clients_master").upsert(clientUpdates, { onConflict: "display_id, tenant_id" });
-      if (!error) stats.clients = clientRows.length;
+      if (error) {
+        throw new Error(`Database error processing Clients: ${error.message}`);
+      }
+      stats.clients = clientRows.length;
     }
 
-    const [{ data: allClients }, { data: allUsers }] = await Promise.all([
+    const [{ data: allClients, error: cErr }, { data: allUsers, error: uErr }] = await Promise.all([
       supabaseAdmin.from("clients_master").select("id, client_name").eq("tenant_id", tenantId),
       supabaseAdmin.from("users").select("id, full_name"),
     ]);
+
+    if (cErr) throw new Error(`Error fetching clients lookup: ${cErr.message}`);
+    if (uErr) throw new Error(`Error fetching users lookup: ${uErr.message}`);
     
     const clientLookup = new Map(allClients?.map(c => [c.client_name.toLowerCase().trim(), c.id]));
     const userLookup = new Map(allUsers?.map(u => [u.full_name.toLowerCase().trim(), u.id]));
@@ -84,11 +97,19 @@ export async function POST(request: Request) {
           event_dates: dates
         };
       }).filter(Boolean);
-      const { error } = await supabaseAdmin.from("events_master").upsert(eventUpdates as any, { onConflict: "display_id, tenant_id" });
-      if (!error) stats.events = (eventUpdates as any[]).length;
+
+      if (eventUpdates.length > 0) {
+        const { error } = await supabaseAdmin.from("events_master").upsert(eventUpdates as any, { onConflict: "display_id, tenant_id" });
+        if (error) {
+          throw new Error(`Database error processing Events: ${error.message}`);
+        }
+        stats.events = (eventUpdates as any[]).length;
+      }
     }
 
-    const { data: allEvents } = await supabaseAdmin.from("events_master").select("id, display_id").eq("tenant_id", tenantId);
+    const { data: allEvents, error: evErr } = await supabaseAdmin.from("events_master").select("id, display_id").eq("tenant_id", tenantId);
+    if (evErr) throw new Error(`Error fetching events lookup: ${evErr.message}`);
+    
     const eventLookup = new Map(allEvents?.map(e => [e.display_id.toLowerCase().trim(), e.id]));
 
     // 4. Process Payments
@@ -107,7 +128,10 @@ export async function POST(request: Request) {
     }).filter(Boolean);
     if (paymentRows.length > 0) {
       const { error } = await supabaseAdmin.from("client_payments").insert(paymentRows as any);
-      if (!error) stats.payments = (paymentRows as any[]).length;
+      if (error) {
+        throw new Error(`Database error processing Payments: ${error.message}`);
+      }
+      stats.payments = (paymentRows as any[]).length;
     }
 
     // 5. Process Artist Expenses
@@ -132,7 +156,10 @@ export async function POST(request: Request) {
     }).filter(Boolean);
     if (artistRows.length > 0) {
       const { error } = await supabaseAdmin.from("artist_expenses").insert(artistRows as any);
-      if (!error) stats.artistExpenses = (artistRows as any[]).length;
+      if (error) {
+        throw new Error(`Database error processing Artist Expenses: ${error.message}`);
+      }
+      stats.artistExpenses = (artistRows as any[]).length;
     }
 
     // 6. Process Output Expenses
@@ -154,7 +181,10 @@ export async function POST(request: Request) {
     }).filter(Boolean);
     if (outputRows.length > 0) {
       const { error } = await supabaseAdmin.from("output_expenses").insert(outputRows as any);
-      if (!error) stats.outputExpenses = (outputRows as any[]).length;
+      if (error) {
+        throw new Error(`Database error processing Output Expenses: ${error.message}`);
+      }
+      stats.outputExpenses = (outputRows as any[]).length;
     }
 
     return NextResponse.json({ message: "Upload processed successfully", stats });

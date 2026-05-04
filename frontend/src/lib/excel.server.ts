@@ -53,7 +53,8 @@ export class ExcelService {
   }
 
   static parseUploadedFile(data: any) {
-    const wb = XLSX.read(data, { type: "array" });
+    const uint8 = data instanceof ArrayBuffer ? new Uint8Array(data) : (data instanceof Uint8Array ? data : new Uint8Array(Buffer.from(data)));
+    const wb = XLSX.read(uint8, { type: "array" });
     const result: { [sheetName: string]: any[] } = {};
 
     wb.SheetNames.forEach((name) => {
