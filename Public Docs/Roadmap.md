@@ -13,6 +13,7 @@
 - [ ] **Team Portal**: Mobile-optimized view for freelancers.
 - [ ] **Cloudflare R2**: Move all image assets to R2 buckets.
 - [ ] **Office PIN Lock**: Auto-timeout glassmorphic PIN shield for secure office desktops.
+- [ ] **Jules (Cloud Builder)**: Integrate background AI builder agent via Jules API (requires dev deployment & staging DB setup first).
 
 ---
 
