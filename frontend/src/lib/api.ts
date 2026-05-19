@@ -7,6 +7,10 @@ async function getApiBase() {
     const cookieStore = await headers();
     const host = cookieStore.get('host');
     if (host) {
+      // If it's a localtunnel or ngrok domain, route internally to localhost to avoid hairpin looping/502s
+      if (host.includes('loca.lt') || host.includes('ngrok')) {
+        return 'http://localhost:3000/api';
+      }
       const protocol = host.startsWith('localhost') || host.startsWith('127.0.0.1') ? 'http' : 'https';
       return `${protocol}://${host}/api`;
     }
@@ -101,6 +105,7 @@ export interface EventWithFinancials {
   total_expenses: number;
   savings: number;
   team_size: number;
+  team_payment_status: string;
 }
 
 export interface ClientDetailResponse {
@@ -255,7 +260,10 @@ export interface TenantResponse {
 // ── API methods ─────────────────────────────────────────────
 
 export const api = {
-  dashboard: (token?: string) => fetchAPI<DashboardResponse>("/dashboard", { token }),
+  dashboard: (fy?: string, token?: string) => {
+    const query = fy && fy !== "all" ? `?fy=${fy}` : "";
+    return fetchAPI<DashboardResponse>(`/dashboard${query}`, { token });
+  },
   me: (token?: string) => fetchAPI<any>("/me", { token }),
   search: (q: string, token?: string) => fetchAPI<SearchResponse>(`/search?q=${encodeURIComponent(q)}`, { token }),
 
@@ -271,7 +279,10 @@ export const api = {
   },
 
   events: {
-    list: (token?: string) => fetchAPI<EventWithFinancials[]>("/events", { token }),
+    list: (fy?: string, token?: string) => {
+      const query = fy && fy !== "all" ? `?fy=${fy}` : "";
+      return fetchAPI<EventWithFinancials[]>(`/events${query}`, { token });
+    },
     meta: (token?: string) => fetchAPI<EventMetaResponse>("/events/meta", { token }),
     get: (id: string, token?: string) => fetchAPI<EventDetailResponse>(`/events/${id}`, { token }),
     create: (data: Record<string, unknown>) =>
@@ -339,6 +350,22 @@ export const api = {
       if (!res.ok) {
         const err = await res.json();
         throw new Error(err.error || "Failed to upload data");
+      }
+      return res.json();
+    },
+    uploadJson: async (data: any, token?: string) => {
+      const apiBase = await getApiBase();
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+      
+      const res = await fetch(`${apiBase}/bulk/upload`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || "Failed to upload JSON data");
       }
       return res.json();
     },

@@ -38,7 +38,8 @@ export default async function EventDetailPage({
     notFound();
   }
 
-  const { event, client, dates, payments, artist_expenses, output_expenses, financials } = data;
+  const { event, client: topClient, dates, payments, artist_expenses, output_expenses, financials } = data;
+  const client = topClient || (event as any).client;
 
   // Determine back link
   let backHref = "/events";
@@ -78,7 +79,7 @@ export default async function EventDetailPage({
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <div className="flex items-center gap-3">
-                <h1 className="text-lg font-bold sm:text-2xl">{event.display_id}</h1>
+                <h1 className="text-lg font-bold sm:text-2xl">{client?.client_name || "Unknown"} | {event.event_type}</h1>
                 {financials.payment_status && (
                   <span className={cn(
                     "inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider",
@@ -209,8 +210,9 @@ export default async function EventDetailPage({
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50/50 dark:bg-slate-800/50">
-                  <th className="px-4 py-3 text-left text-xs font-medium opacity-60 sm:text-sm">Item / Vendor</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium opacity-60 sm:text-sm">Item</th>
                   <th className="px-4 py-3 text-center text-xs font-medium opacity-60 sm:text-sm">Qty</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium opacity-60 sm:text-sm">Editor / Vendor</th>
                   <th className="px-4 py-3 text-right text-xs font-medium opacity-60 sm:text-sm">Amount</th>
                   <th className="px-4 py-3 text-right text-xs font-medium opacity-60 sm:text-sm">Paid</th>
                   <th className="px-4 py-3 text-right text-xs font-medium opacity-60 sm:text-sm">Balance</th>
@@ -222,6 +224,18 @@ export default async function EventDetailPage({
                   <tr key={o.id} className="transition-colors hover:bg-gray-50/50 dark:hover:bg-slate-800/30">
                     <td className="px-4 py-3 font-medium">{o.deliverable}</td>
                     <td className="px-4 py-3 text-center text-xs text-gray-600 dark:text-gray-300 sm:text-sm">{o.quantity}</td>
+                    <td className="px-4 py-3 text-xs sm:text-sm">
+                      {o.user_id ? (
+                        <Link 
+                          href={`/team/${(o as any).display_id || o.user_id}?from=event&eventId=${event.display_id || event.id}&fromName=${event.display_id}`}
+                          className="font-medium text-brand-600 hover:underline"
+                        >
+                          {o.member_name || "Assigned Editor"}
+                        </Link>
+                      ) : (
+                        <span className="opacity-40">—</span>
+                      )}
+                    </td>
                     <td className="whitespace-nowrap px-4 py-3 text-right text-xs font-medium sm:text-sm">{formatCurrency(o.total_amount)}</td>
                     <td className="whitespace-nowrap px-4 py-3 text-right text-xs text-gray-600 dark:text-gray-400 sm:text-sm">{formatCurrency(o.advance_paid)}</td>
                     <td className="whitespace-nowrap px-4 py-3 text-right text-xs font-medium text-amber-600 sm:text-sm">{formatCurrency(o.balance)}</td>

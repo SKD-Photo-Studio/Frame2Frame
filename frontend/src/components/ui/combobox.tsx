@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { ChevronDown, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -49,9 +49,11 @@ export function Combobox({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const filteredOptions = query === "" 
-    ? options 
-    : options.filter((o) => o.label.toLowerCase().includes(query.toLowerCase()));
+  const filteredOptions = useMemo(() => {
+    return query === "" 
+      ? options 
+      : options.filter((o) => o.label.toLowerCase().includes(query.toLowerCase()));
+  }, [query, options]);
 
   return (
     <div ref={containerRef} className="relative w-full">
@@ -105,6 +107,19 @@ export function Combobox({
                 <span className="block truncate">{option.label}</span>
               </div>
             ))}
+
+            {freeText && query && !options.some(o => o.label.toLowerCase() === query.toLowerCase()) && (
+              <div
+                className="relative cursor-pointer select-none py-2.5 pl-3 pr-9 border-t border-gray-100 dark:border-gray-800/80 hover:bg-brand-50 dark:hover:bg-brand-900/20 text-brand-600 dark:text-brand-400 text-sm font-semibold flex items-center gap-1.5"
+                onClick={() => {
+                  onChange(query);
+                  setOpen(false);
+                }}
+              >
+                <Plus className="h-3.5 w-3.5" />
+                Add custom: "{query}"
+              </div>
+            )}
           </div>
 
           {onAddNew && (

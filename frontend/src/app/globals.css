@@ -16,15 +16,15 @@
 
 
 .dark {
-  --background: #1a1a1a;
-  --foreground: #ffffff;
-  --card: #000000;
-  --card-foreground: #ffffff;
-  --border: #333333;
-  --card-opacity: 50%;  /* 50% opaque */
+  --background: #0f172a;
+  --foreground: #f8fafc;
+  --card: #1e293b;
+  --card-foreground: #f8fafc;
+  --border: rgba(255, 255, 255, 0.08);
+  --card-opacity: 75%;  /* Premium high-end glassmorphism opacity */
   --pattern-url: url("/images/pattern-bg-dark.png");
-  --bg-brightness: 0.5;
-  --bg-opacity: 0.8;
+  --bg-brightness: 0.35;
+  --bg-opacity: 0.75;
 }
 
 

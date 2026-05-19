@@ -32,8 +32,8 @@ export default function LogoUpload({ currentLogoUrl, onUploadComplete }: LogoUpl
 
       // 1. Compression
       const options = {
-        maxSizeMB: 0.1, // 100KB
-        maxWidthOrHeight: 500,
+        maxSizeMB: 0.5, // 500KB
+        maxWidthOrHeight: 800,
         useWebWorker: true,
       };
 
@@ -80,7 +80,7 @@ export default function LogoUpload({ currentLogoUrl, onUploadComplete }: LogoUpl
         </div>
         <div className="flex-1">
           <label className="block text-sm font-medium text-gray-700">Company Logo</label>
-          <p className="text-xs text-gray-500 mb-2">Max 100KB, 500x500px (Auto-compressed)</p>
+          <p className="text-xs text-gray-500 mb-2">Max 500KB, 800x800px (Auto-compressed)</p>
           <input
             type="file"
             accept="image/*"

@@ -80,6 +80,7 @@ export async function GET(
         date_string: formatDates(event.event_dates ?? []),
         clients_master: undefined,
       },
+      client: (event as any).clients_master ?? null,
       dates: event.event_dates ?? [],
       payments: payments ?? [],
       artist_expenses: (artistExp ?? []).map((a: any) => {

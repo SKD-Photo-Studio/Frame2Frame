@@ -1,256 +1,131 @@
 import { NextResponse } from "next/server";
 import { ExcelService } from "@/lib/excel.server";
-import { supabaseAdmin, getDefaultTenantId } from "@/lib/supabase.server";
+import { supabaseAdmin } from "@/lib/supabase.server";
+import { withApiWrapper } from "@/lib/api-utils";
+import {
+  validateSheetRows,
+  TeamRowSchema,
+  ClientRowSchema,
+  EventRowSchema,
+  PaymentRowSchema,
+  ArtistExpenseRowSchema,
+  OutputExpenseRowSchema
+} from "@/lib/bulk-validation";
 
 export const runtime = 'edge';
 
-export async function POST(request: Request) {
-  try {
+export const POST = withApiWrapper<any>(async (tenantId, request) => {
+  let sheets: Record<string, any[]> = {};
+
+  const contentType = request.headers.get("content-type") || "";
+  if (contentType.includes("application/json")) {
+    const body = await request.json();
+    sheets = {
+      [ExcelService.SHEETS.TEAM]: body.team || [],
+      [ExcelService.SHEETS.CLIENTS]: body.clients || [],
+      [ExcelService.SHEETS.EVENTS]: body.events || [],
+      [ExcelService.SHEETS.PAYMENTS]: body.payments || [],
+      [ExcelService.SHEETS.ARTIST_EXPENSES]: body.artistExpenses || [],
+      [ExcelService.SHEETS.OUTPUT_EXPENSES]: body.outputExpenses || [],
+    };
+  } else {
     const formData = await request.formData();
     const file = formData.get("file") as File;
-    if (!file) return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
+    if (!file) {
+      return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
+    }
 
-    const tenantId = await getDefaultTenantId();
     const arrayBuffer = await file.arrayBuffer();
-    const sheets = ExcelService.parseUploadedFile(arrayBuffer);
-    const stats = { clients: 0, team: 0, events: 0, payments: 0, artistExpenses: 0, outputExpenses: 0 };
-
-    // 1. Process Team
-    const teamRows = sheets[ExcelService.SHEETS.TEAM] || [];
-    if (teamRows.length > 0) {
-      const teamUpdates = teamRows.map(row => ({
-        display_id: String(row["Display ID"]).trim(),
-        full_name: String(row["Full Name"]).trim(),
-        email: row["Email"] && String(row["Email"]).trim() !== "" ? String(row["Email"]).trim() : null,
-        phone_number: row["Phone"] && String(row["Phone"]).trim() !== "" ? String(row["Phone"]).trim() : "",
-        usual_role: String(row["Usual Role"] || "").trim()
-      }));
-      
-      const { data: upsertedUsers, error } = await supabaseAdmin
-        .from("users")
-        .upsert(teamUpdates, { onConflict: "display_id" })
-        .select("id");
-
-      if (error) {
-        throw new Error(`Database error processing Team: ${error.message}`);
-      }
-
-      if (upsertedUsers) {
-        stats.team = teamRows.length;
-        
-        const { data: existingMemberships } = await supabaseAdmin
-          .from("workspace_memberships")
-          .select("user_id")
-          .eq("tenant_id", tenantId);
-        
-        const existingUserIds = new Set(existingMemberships?.map(m => m.user_id) || []);
-
-        const memberships = upsertedUsers
-          .map(u => u.id)
-          .filter(id => !existingUserIds.has(id))
-          .map(id => ({
-            user_id: id,
-            tenant_id: tenantId,
-            role: "MEMBER"
-          }));
-
-        if (memberships.length > 0) {
-          const { error: mError } = await supabaseAdmin.from("workspace_memberships").insert(memberships);
-          if (mError) {
-            throw new Error(`Database error setting memberships: ${mError.message}`);
-          }
-        }
-      }
-    }
-
-    // 2. Process Clients
-    const clientRows = sheets[ExcelService.SHEETS.CLIENTS] || [];
-    if (clientRows.length > 0) {
-      const clientUpdates = clientRows.map(row => ({
-        tenant_id: tenantId,
-        display_id: String(row["Display ID"]).trim(),
-        client_name: String(row["Client Name"]).trim(),
-        phone_number: row["Phone"] && String(row["Phone"]).trim() !== "" ? String(row["Phone"]).trim() : null,
-        email: row["Email"] && String(row["Email"]).trim() !== "" ? String(row["Email"]).trim() : null,
-        notes: String(row["Notes"] || "").trim()
-      }));
-      const { error } = await supabaseAdmin.from("clients_master").upsert(clientUpdates, { onConflict: "display_id" });
-      if (error) {
-        throw new Error(`Database error processing Clients: ${error.message}`);
-      }
-      stats.clients = clientRows.length;
-    }
-
-    const [{ data: allClients, error: cErr }, { data: allUsers, error: uErr }] = await Promise.all([
-      supabaseAdmin.from("clients_master").select("id, client_name").eq("tenant_id", tenantId),
-      supabaseAdmin.from("users").select("id, full_name"),
-    ]);
-
-    if (cErr) throw new Error(`Error fetching clients lookup: ${cErr.message}`);
-    if (uErr) throw new Error(`Error fetching users lookup: ${uErr.message}`);
-    
-    const clientLookup = new Map(allClients?.map(c => [c.client_name.toLowerCase().trim(), c.id]));
-    const userLookup = new Map(allUsers?.map(u => [u.full_name.toLowerCase().trim(), u.id]));
-
-    // 3. Process Events
-    const eventRows = sheets[ExcelService.SHEETS.EVENTS] || [];
-    if (eventRows.length > 0) {
-      const eventUpdates = eventRows.map(row => {
-        const clientName = String(row["Client Name"] || "").toLowerCase().trim();
-        const clientId = clientLookup.get(clientName);
-        if (!clientId) return null;
-        const dates = row["Dates"] ? String(row["Dates"]).split(",").map(d => d.trim()) : [];
-        return {
-          tenant_id: tenantId,
-          display_id: String(row["Display ID"]).trim(),
-          client_id: clientId,
-          event_type: String(row["Event Type"]).trim(),
-          venue: String(row["Venue"] || "").trim(),
-          city: String(row["City"] || "").trim(),
-          package_value: Number(row["Package Value"]) || 0,
-          event_dates: dates
-        };
-      }).filter(Boolean);
-
-      if (eventUpdates.length > 0) {
-        const { error } = await supabaseAdmin.from("events_master").upsert(eventUpdates as any, { onConflict: "display_id" });
-        if (error) {
-          throw new Error(`Database error processing Events: ${error.message}`);
-        }
-        stats.events = (eventUpdates as any[]).length;
-      }
-    }
-
-    const { data: allEvents, error: evErr } = await supabaseAdmin.from("events_master").select("id, display_id").eq("tenant_id", tenantId);
-    if (evErr) throw new Error(`Error fetching events lookup: ${evErr.message}`);
-    
-    const eventLookup = new Map(allEvents?.map(e => [e.display_id.toLowerCase().trim(), e.id]));
-
-    // 4. Process Payments
-    const paymentRows = (sheets[ExcelService.SHEETS.PAYMENTS] || []).map(row => {
-      const eventId = eventLookup.get(String(row["Event Display ID"] || "").toLowerCase().trim());
-      if (!eventId) return null;
-      return {
-        tenant_id: tenantId,
-        event_id: eventId,
-        installment_type: String(row["Type"]).trim(),
-        amount: Number(row["Amount"]) || 0,
-        payment_method: String(row["Method"] || "Cash").trim(),
-        transaction_id: String(row["Transaction ID"] || "").trim(),
-        payment_date: row["Date"] && String(row["Date"]).trim() !== "" ? String(row["Date"]).trim() : null,
-      };
-    }).filter(Boolean);
-
-    if (paymentRows.length > 0) {
-      const { data: existingPayments } = await supabaseAdmin
-        .from("client_payments")
-        .select("event_id, installment_type, amount, payment_date")
-        .eq("tenant_id", tenantId);
-      
-      const existingPaymentKeys = new Set(
-        existingPayments?.map(p => `${p.event_id}_${p.installment_type}_${p.amount}_${p.payment_date}`) || []
-      );
-
-      const filteredPayments = paymentRows.filter(p => {
-        return !existingPaymentKeys.has(`${p!.event_id}_${p!.installment_type}_${p!.amount}_${p!.payment_date}`);
-      });
-
-      if (filteredPayments.length > 0) {
-        const { error } = await supabaseAdmin.from("client_payments").insert(filteredPayments as any);
-        if (error) {
-          throw new Error(`Database error processing Payments: ${error.message}`);
-        }
-      }
-      stats.payments = filteredPayments.length;
-    }
-
-    // 5. Process Artist Expenses
-    const artistRows = (sheets[ExcelService.SHEETS.ARTIST_EXPENSES] || []).map(row => {
-      const eventId = eventLookup.get(String(row["Event Display ID"] || "").toLowerCase().trim());
-      const userName = String(row["User Name"] || "").toLowerCase().trim();
-      const userId = userLookup.get(userName);
-      if (!eventId || !userId) return null;
-      return {
-        tenant_id: tenantId,
-        event_id: eventId,
-        user_id: userId,
-        assignment_role: String(row["Role"] || "").trim(),
-        pay_type: String(row["Pay Type"] || "").trim(),
-        date_start: row["Start Date"] && String(row["Start Date"]).trim() !== "" ? String(row["Start Date"]).trim() : null,
-        date_end: row["End Date"] && String(row["End Date"]).trim() !== "" ? String(row["End Date"]).trim() : null,
-        no_of_days: Number(row["Days"]) || 1,
-        per_day_rate: Number(row["Rate"]) || 0,
-        total_amount: Number(row["Total"]) || 0,
-        advance_paid: Number(row["Advance"]) || 0,
-      };
-    }).filter(Boolean);
-
-    if (artistRows.length > 0) {
-      const { data: existingArtistExpenses } = await supabaseAdmin
-        .from("artist_expenses")
-        .select("event_id, user_id, assignment_role")
-        .eq("tenant_id", tenantId);
-      
-      const existingArtistKeys = new Set(
-        existingArtistExpenses?.map(a => `${a.event_id}_${a.user_id}_${a.assignment_role}`) || []
-      );
-
-      const filteredArtists = artistRows.filter(a => {
-        return !existingArtistKeys.has(`${a!.event_id}_${a!.user_id}_${a!.assignment_role}`);
-      });
-
-      if (filteredArtists.length > 0) {
-        const { error } = await supabaseAdmin.from("artist_expenses").insert(filteredArtists as any);
-        if (error) {
-          throw new Error(`Database error processing Artist Expenses: ${error.message}`);
-        }
-      }
-      stats.artistExpenses = filteredArtists.length;
-    }
-
-    // 6. Process Output Expenses
-    const outputRows = (sheets[ExcelService.SHEETS.OUTPUT_EXPENSES] || []).map(row => {
-      const eventId = eventLookup.get(String(row["Event Display ID"] || "").toLowerCase().trim());
-      const userName = String(row["User Name"] || "").toLowerCase().trim();
-      const userId = userLookup.get(userName);
-      if (!eventId || !userId) return null;
-      return {
-        tenant_id: tenantId,
-        event_id: eventId,
-        user_id: userId,
-        assignment_role: String(row["Role"] || "Editor").trim(),
-        deliverable: String(row["Deliverable"] || "").trim(),
-        quantity: Number(row["Quantity"]) || 1,
-        total_amount: Number(row["Total"]) || 0,
-        advance_paid: Number(row["Advance"]) || 0,
-      };
-    }).filter(Boolean);
-
-    if (outputRows.length > 0) {
-      const { data: existingOutputExpenses } = await supabaseAdmin
-        .from("output_expenses")
-        .select("event_id, user_id, assignment_role, deliverable")
-        .eq("tenant_id", tenantId);
-      
-      const existingOutputKeys = new Set(
-        existingOutputExpenses?.map(o => `${o.event_id}_${o.user_id}_${o.assignment_role}_${o.deliverable}`) || []
-      );
-
-      const filteredOutputs = outputRows.filter(o => {
-        return !existingOutputKeys.has(`${o!.event_id}_${o!.user_id}_${o!.assignment_role}_${o!.deliverable}`);
-      });
-
-      if (filteredOutputs.length > 0) {
-        const { error } = await supabaseAdmin.from("output_expenses").insert(filteredOutputs as any);
-        if (error) {
-          throw new Error(`Database error processing Output Expenses: ${error.message}`);
-        }
-      }
-      stats.outputExpenses = filteredOutputs.length;
-    }
-
-    return NextResponse.json({ message: "Upload processed successfully", stats });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    sheets = ExcelService.parseUploadedFile(arrayBuffer);
   }
-}
+
+  // 1. Zod-Powered Schema Validation
+  let parsedTeam: any[] = [];
+  let parsedClients: any[] = [];
+  let parsedEvents: any[] = [];
+  let parsedPayments: any[] = [];
+  let parsedArtists: any[] = [];
+  let parsedOutputs: any[] = [];
+
+  // Team
+  if (sheets[ExcelService.SHEETS.TEAM]) {
+    const res = validateSheetRows(ExcelService.SHEETS.TEAM, sheets[ExcelService.SHEETS.TEAM], TeamRowSchema);
+    if (!res.success) {
+      return NextResponse.json({ error: res.error }, { status: 400 });
+    }
+    parsedTeam = res.data || [];
+  }
+
+  // Clients
+  if (sheets[ExcelService.SHEETS.CLIENTS]) {
+    const res = validateSheetRows(ExcelService.SHEETS.CLIENTS, sheets[ExcelService.SHEETS.CLIENTS], ClientRowSchema);
+    if (!res.success) {
+      return NextResponse.json({ error: res.error }, { status: 400 });
+    }
+    parsedClients = res.data || [];
+  }
+
+  // Events
+  if (sheets[ExcelService.SHEETS.EVENTS]) {
+    const res = validateSheetRows(ExcelService.SHEETS.EVENTS, sheets[ExcelService.SHEETS.EVENTS], EventRowSchema);
+    if (!res.success) {
+      return NextResponse.json({ error: res.error }, { status: 400 });
+    }
+    parsedEvents = res.data || [];
+  }
+
+  // Payments
+  if (sheets[ExcelService.SHEETS.PAYMENTS]) {
+    const res = validateSheetRows(ExcelService.SHEETS.PAYMENTS, sheets[ExcelService.SHEETS.PAYMENTS], PaymentRowSchema);
+    if (!res.success) {
+      return NextResponse.json({ error: res.error }, { status: 400 });
+    }
+    parsedPayments = res.data || [];
+  }
+
+  // Artist Expenses
+  if (sheets[ExcelService.SHEETS.ARTIST_EXPENSES]) {
+    const res = validateSheetRows(
+      ExcelService.SHEETS.ARTIST_EXPENSES,
+      sheets[ExcelService.SHEETS.ARTIST_EXPENSES],
+      ArtistExpenseRowSchema
+    );
+    if (!res.success) {
+      return NextResponse.json({ error: res.error }, { status: 400 });
+    }
+    parsedArtists = res.data || [];
+  }
+
+  // Output Expenses
+  if (sheets[ExcelService.SHEETS.OUTPUT_EXPENSES]) {
+    const res = validateSheetRows(
+      ExcelService.SHEETS.OUTPUT_EXPENSES,
+      sheets[ExcelService.SHEETS.OUTPUT_EXPENSES],
+      OutputExpenseRowSchema
+    );
+    if (!res.success) {
+      return NextResponse.json({ error: res.error }, { status: 400 });
+    }
+    parsedOutputs = res.data || [];
+  }
+
+  // 2. Atomic Database Transaction via RPC
+  const { data: stats, error } = await supabaseAdmin.rpc("bulk_import_data", {
+    p_tenant_id: tenantId,
+    p_team_rows: parsedTeam,
+    p_client_rows: parsedClients,
+    p_event_rows: parsedEvents,
+    p_payment_rows: parsedPayments,
+    p_artist_rows: parsedArtists,
+    p_output_rows: parsedOutputs
+  });
+
+  if (error) {
+    return NextResponse.json({ error: `Database Transaction Failed: ${error.message}` }, { status: 400 });
+  }
+
+  return NextResponse.json({
+    message: "Data bulk ingestion processed and hardened successfully!",
+    stats
+  });
+});

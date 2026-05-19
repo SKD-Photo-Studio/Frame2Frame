@@ -22,7 +22,7 @@ const colorVariants = {
   indigo: "bg-indigo-50 text-indigo-600",
 };
 
-export function StatCard({ label, value, icon, color, className }: StatCardProps) {
+export const StatCard = React.memo(function StatCard({ label, value, icon, color, className }: StatCardProps) {
   return (
     <div className={cn("stat-card flex items-center gap-2.5", className)}>
       <div className={cn(
@@ -42,9 +42,9 @@ export function StatCard({ label, value, icon, color, className }: StatCardProps
       </div>
     </div>
   );
-}
+});
 
-export function FinanceCard({ label, value, icon, color, className }: StatCardProps) {
+export const FinanceCard = React.memo(function FinanceCard({ label, value, icon, color, className }: StatCardProps) {
   // Alias for backward compatibility during transition or specific semantic usage
   return <StatCard label={label} value={value} icon={icon} color={color} className={className} />;
-}
+});

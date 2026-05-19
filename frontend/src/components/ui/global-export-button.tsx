@@ -35,6 +35,7 @@ export default function GlobalExportButton() {
     <button
       onClick={handleExport}
       disabled={loading}
+      suppressHydrationWarning={true}
       className="flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition-colors opacity-80 hover:opacity-100 disabled:opacity-50"
       style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)' }}
     >

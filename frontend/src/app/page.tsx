@@ -14,9 +14,16 @@ import { api, DashboardResponse } from "@/lib/api";
 import { formatCurrency, getEventTypeColor, cn } from "@/lib/utils";
 import { StatCard } from "@/components/ui/stat-card";
 import BulkOperationsWrapper from "@/components/ui/bulk-operations-wrapper";
+import FinancialYearFilter from "@/components/ui/financial-year-filter";
 
-export default async function DashboardPage() {
-  const data: DashboardResponse = await api.dashboard();
+interface PageProps {
+  searchParams: Promise<{ fy?: string }>;
+}
+
+export default async function DashboardPage({ searchParams }: PageProps) {
+  const sp = await searchParams;
+  const fy = sp.fy || "all";
+  const data: DashboardResponse = await api.dashboard(fy);
 
   return (
     <div>
@@ -27,7 +34,10 @@ export default async function DashboardPage() {
             Overview of your business at a glance
           </p>
         </div>
-        <BulkOperationsWrapper />
+        <div className="flex items-center gap-3">
+          <FinancialYearFilter />
+          <BulkOperationsWrapper />
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">

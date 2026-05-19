@@ -20,7 +20,7 @@ export default async function middleware(request: NextRequest) {
           return request.cookies.getAll()
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
+          cookiesToSet.forEach(({ name, value, options }) => request.cookies.set({ name, value, ...options }))
           response = NextResponse.next({
             request: {
               headers: request.headers,
@@ -60,8 +60,11 @@ export default async function middleware(request: NextRequest) {
   const isLoginPage = request.nextUrl.pathname === '/login'
   const isAuthRoute = request.nextUrl.pathname.startsWith('/api/auth') 
   const isPublicApi = request.nextUrl.pathname === '/api/tenant' || request.nextUrl.pathname === '/api/tenant/logo'
+  const isBulkRoute = request.nextUrl.pathname.startsWith('/api/bulk')
+  const apiKey = request.headers.get('x-api-key')
+  const isAuthorizedApiKey = apiKey && apiKey === process.env.F2F_STUDIO_LIVE_SYNC_SECRET
 
-  if (!user && !isLoginPage && !isAuthRoute && !isPublicApi && !isPublicAsset) {
+  if (!user && !isLoginPage && !isAuthRoute && !isPublicApi && !isPublicAsset && !(isBulkRoute && isAuthorizedApiKey)) {
     if (request.nextUrl.pathname.startsWith('/api')) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }

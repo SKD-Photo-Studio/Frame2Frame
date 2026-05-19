@@ -8,7 +8,7 @@
 - **Runtime**: React 19 / Edge Runtime (Cloudflare Optimized)
 - **Language**: TypeScript
 - **Styling**: Vanilla CSS (Premium Glassmorphism Design)
-- **Database**: Supabase (PostgreSQL)
+- **Database**: Supabase (PostgreSQL) - Accurate Master Migration Data Synced as of May 4, 2026.
 - **Auth**: Supabase SSR
 - **Infrastructure**: Cloudflare Pages
 
@@ -46,3 +46,4 @@
 > [!IMPORTANT]
 > - **Development Repo** (`origin` - `Ashwyn-Mangalampalli/SKD-Frame2Frame`): AntiGravity (you) will always ask human (me) for confirmation before pushing.
 > - **Production Repo** (`mirror` - `SKD-Photo-Studio/Frame2Frame`): AntiGravity (you) will always ask human (me) for confirmation before triggering the production build.
+> - **AI Behavior**: Don't assume, ask. Always request clarification on any ambiguity.

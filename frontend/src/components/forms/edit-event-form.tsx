@@ -76,7 +76,7 @@ function EditEventForm({ event, onSuccess }: Props & { onSuccess: () => void }) 
       venue: venue,
       city: city,
       package_value: Number(fd.get("package_value")) || 0,
-      event_dates: dates.map((d) => d.toISOString().split("T")[0]),
+      event_dates: dates.map((d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`),
     };
 
     try {
@@ -109,7 +109,7 @@ function EditEventForm({ event, onSuccess }: Props & { onSuccess: () => void }) 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="mb-1.5 block text-sm font-medium text-gray-700">Event Type *</label>
+        <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Event Type *</label>
         <Combobox
           value={eventType}
           onChange={setEventType}
@@ -127,13 +127,13 @@ function EditEventForm({ event, onSuccess }: Props & { onSuccess: () => void }) 
       </div>
 
       <div>
-        <label className="mb-1.5 block text-sm font-medium text-gray-700">Event Dates</label>
+        <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Event Dates</label>
         <DateSelector dates={dates} onChange={setDates} />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-gray-700">Venue</label>
+          <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Venue</label>
           <Combobox
             value={venue}
             onChange={setVenue}
@@ -143,7 +143,7 @@ function EditEventForm({ event, onSuccess }: Props & { onSuccess: () => void }) 
           />
         </div>
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-gray-700">City</label>
+          <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">City</label>
           <Combobox
             value={city}
             onChange={setCity}
@@ -155,7 +155,7 @@ function EditEventForm({ event, onSuccess }: Props & { onSuccess: () => void }) 
       </div>
 
       <div>
-        <label className="mb-1.5 block text-sm font-medium text-gray-700">Package Value (₹)</label>
+        <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Package Value (₹)</label>
         <input
           name="package_value"
           type="number"

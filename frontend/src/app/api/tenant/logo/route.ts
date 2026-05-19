@@ -14,8 +14,21 @@ export async function POST(request: Request) {
     if (!matches) return NextResponse.json({ error: "Invalid base64 format" }, { status: 400 });
 
     const mimeType = matches[1];
+    
+    // 1. Enforce strict MIME type filtering to prevent SVG XSS injection vulnerabilities
+    const ALLOWED_MIME_TYPES = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
+    if (!ALLOWED_MIME_TYPES.includes(mimeType)) {
+      return NextResponse.json({ error: "Only PNG, JPEG, and WEBP image formats are allowed" }, { status: 400 });
+    }
+
     const extension = mimeType.split("/")[1];
     const buffer = Buffer.from(matches[2], "base64");
+
+    // 2. Enforce strict file size limits to prevent Edge Worker memory exhaustion
+    const MAX_SIZE_BYTES = 2 * 1024 * 1024; // 2MB limit
+    if (buffer.length > MAX_SIZE_BYTES) {
+      return NextResponse.json({ error: "Logo file size must not exceed 2MB" }, { status: 400 });
+    }
     
     const fileName = `tenant_${tenantId}_logo_${Date.now()}.${extension}`;
     const filePath = fileName;

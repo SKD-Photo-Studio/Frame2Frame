@@ -134,7 +134,7 @@ export default async function ClientDetailPage({
                     )}
                   </div>
                   <h3 className="mt-2 text-sm font-semibold group-hover:text-brand-600 sm:text-base">
-                    {event.display_id}
+                    {event.client_name} | {event.event_type}
                   </h3>
                   <p className="mt-1 text-xs opacity-60 sm:text-sm">{event.venue}, {event.city}</p>
                   <div className="mt-1 flex items-center justify-between">
