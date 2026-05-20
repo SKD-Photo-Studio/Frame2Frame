@@ -77,7 +77,7 @@
   }
   
   .page-title {
-    @apply text-xl font-bold sm:text-2xl;
+    @apply text-xl font-bold sm:text-2xl min-w-0;
     color: var(--foreground);
   }
   .section-title {

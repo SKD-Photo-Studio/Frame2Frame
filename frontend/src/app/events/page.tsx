@@ -25,7 +25,7 @@ export default async function EventsPage({ searchParams }: PageProps) {
           <h1 className="page-title">Events</h1>
           <p className="mt-0.5 text-sm text-gray-500">{events.length} events tracked</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center justify-start gap-3 sm:justify-end">
           <FinancialYearFilter />
           <BulkOperationsWrapper />
           <AddEventButton />

@@ -81,7 +81,7 @@ export function DateSelector({ dates, onChange }: { dates: Date[]; onChange: (d:
 
       {/* Dropdown calendar */}
       {open && (
-        <div className="absolute left-0 top-full z-20 mt-1 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-xl">
+        <div className="absolute left-1/2 -translate-x-1/2 sm:translate-x-0 sm:left-0 top-full z-20 mt-1 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-xl">
           <Calendar
             mode="multiple"
             selected={dates}

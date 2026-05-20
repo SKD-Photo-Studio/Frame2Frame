@@ -20,7 +20,7 @@ export default async function ClientsPage() {
             {clients.length} clients registered
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center justify-start gap-3 sm:justify-end">
           <BulkOperationsWrapper />
           <AddClientButton />
         </div>

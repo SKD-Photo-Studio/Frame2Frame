@@ -67,37 +67,37 @@ function LoginFormContent() {
 
       <div className="w-full max-w-md relative z-10 font-[family-name:var(--font-outfit)]">
         {/* New Header Hierarchy */}
-        <div className="text-center mb-8 animate-fade-in">
+        <div className="text-center mb-4 sm:mb-8 animate-fade-in">
           {/* Double Frame Icon */}
-          <div className="flex justify-center mb-4">
-            <div className="relative w-10 h-10">
-              <div className="absolute top-0 right-0 w-7 h-7 border-2 border-gray-900 rounded-lg bg-white/50" />
-              <div className="absolute bottom-0 left-0 w-7 h-7 border-2 border-gray-900 rounded-lg bg-white shadow-sm" />
+          <div className="flex justify-center mb-3 sm:mb-4">
+            <div className="relative w-8 h-8 sm:w-10 sm:h-10">
+              <div className="absolute top-0 right-0 w-5 h-5 sm:w-7 sm:h-7 border-2 border-gray-900 rounded-lg bg-white/50" />
+              <div className="absolute bottom-0 left-0 w-5 h-5 sm:w-7 sm:h-7 border-2 border-gray-900 rounded-lg bg-white shadow-sm" />
             </div>
           </div>
-
-          <h1 className="text-5xl font-extrabold text-gray-900 tracking-tight mb-2">
+ 
+          <h1 className="text-3xl xs:text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tight mb-1 sm:mb-2">
             Frame2Frame
           </h1>
-          <p className="text-gray-500 text-sm font-bold uppercase tracking-[0.4em] mb-8">
+          <p className="text-gray-500 text-xs sm:text-sm font-bold uppercase tracking-[0.4em] mb-4 sm:mb-8">
             Internal Portal
           </p>
-
-          <div className="flex flex-col items-center gap-3 mb-8">
-            <div className="h-px w-16 bg-gray-200" />
-            <div className="flex items-center gap-4">
+ 
+          <div className="flex flex-col items-center gap-2 sm:gap-3 mb-4 sm:mb-8">
+            <div className="h-px w-12 sm:w-16 bg-gray-200" />
+            <div className="flex items-center gap-3 sm:gap-4">
               {tenant?.logo_url && (
                 <img 
                   src={tenant.logo_url} 
                   alt="" 
-                  className="h-12 w-auto object-contain"
+                  className="h-10 sm:h-12 w-auto object-contain"
                 />
               )}
-              <h2 className="text-lg font-medium text-gray-700">
+              <h2 className="text-sm sm:text-lg font-medium text-gray-700">
                 Made for <span className="text-black font-bold">{tenant?.company_name || 'SKD Photo Studio'}</span>
               </h2>
             </div>
-            <div className="h-px w-16 bg-gray-200" />
+            <div className="h-px w-12 sm:w-16 bg-gray-200" />
           </div>
         </div>
 

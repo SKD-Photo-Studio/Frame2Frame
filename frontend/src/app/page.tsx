@@ -34,13 +34,13 @@ export default async function DashboardPage({ searchParams }: PageProps) {
             Overview of your business at a glance
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center justify-start gap-3 sm:justify-end">
           <FinancialYearFilter />
           <BulkOperationsWrapper />
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-1 xs:grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <Link href="/clients?from=dashboard" className="block"><StatCard label="Total Clients" value={data.total_clients.toString()} icon={<Users className="h-5 w-5" />} color="blue" /></Link>
         <Link href="/events?from=dashboard" className="block"><StatCard label="Total Events" value={data.total_events.toString()} icon={<Calendar className="h-5 w-5" />} color="purple" /></Link>
         <Link href="/team?from=dashboard" className="block"><StatCard label="Team Size" value={data.total_team_members.toString()} icon={<UserCircle className="h-5 w-5" />} color="teal" /></Link>

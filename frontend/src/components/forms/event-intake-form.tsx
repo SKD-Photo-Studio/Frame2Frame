@@ -408,7 +408,7 @@ export default function EventIntakeForm({ onSuccess, initialClientId, eventId }:
 
           {isNewClient ? (
             <div className="p-3 bg-gray-50/50 dark:bg-gray-900/40 border border-dashed border-gray-200 dark:border-gray-800 rounded-xl space-y-3">
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Name *</label>
                   <input
@@ -430,7 +430,7 @@ export default function EventIntakeForm({ onSuccess, initialClientId, eventId }:
                   />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Email</label>
                   <input
@@ -479,7 +479,7 @@ export default function EventIntakeForm({ onSuccess, initialClientId, eventId }:
             </div>
           )}
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Event Type *</label>
               <Combobox
@@ -502,8 +502,8 @@ export default function EventIntakeForm({ onSuccess, initialClientId, eventId }:
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
-            <div className="col-span-2">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="sm:col-span-2">
               <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Event Dates *</label>
               <DateSelector dates={dates} onChange={setDates} />
             </div>
@@ -634,12 +634,12 @@ export default function EventIntakeForm({ onSuccess, initialClientId, eventId }:
       {/* Form Bottom Control Buttons */}
       <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 pt-4 border-t border-gray-100 dark:border-gray-800">
         {/* Left Side: Navigation (Prev / Next Stage) */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 w-full sm:w-auto">
           <button
             type="button"
             onClick={prevStep}
             disabled={activeStep === 1}
-            className="px-3.5 py-2 text-xs font-semibold border border-gray-200 dark:border-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors disabled:opacity-30 disabled:hover:bg-transparent"
+            className={`px-3.5 py-2 text-xs font-semibold border border-gray-200 dark:border-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors disabled:opacity-30 disabled:hover:bg-transparent ${activeStep === 4 ? "w-full sm:w-auto" : "flex-1 sm:flex-none"}`}
           >
             Back
           </button>
@@ -648,7 +648,7 @@ export default function EventIntakeForm({ onSuccess, initialClientId, eventId }:
             <button
               type="button"
               onClick={nextStep}
-              className="px-3.5 py-2 text-xs font-semibold border border-gray-200 dark:border-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+              className="flex-1 sm:flex-none px-3.5 py-2 text-xs font-semibold border border-gray-200 dark:border-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
             >
               Next
             </button>
@@ -656,12 +656,12 @@ export default function EventIntakeForm({ onSuccess, initialClientId, eventId }:
         </div>
 
         {/* Right Side: Save Actions */}
-        <div className="flex items-center justify-end gap-2">
+        <div className="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto">
           <button
             type="button"
             onClick={() => handleSubmit(false)}
             disabled={loading}
-            className="inline-flex items-center justify-center px-4 py-2 text-xs font-semibold text-brand-700 bg-brand-50 border border-brand-200 hover:bg-brand-100 dark:bg-brand-950/20 dark:border-brand-900/50 dark:text-brand-400 dark:hover:bg-brand-950/30 rounded-lg transition-colors shadow-sm disabled:opacity-50 min-w-[70px]"
+            className="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-2 text-xs font-semibold text-brand-700 bg-brand-50 border border-brand-200 hover:bg-brand-100 dark:bg-brand-950/20 dark:border-brand-900/50 dark:text-brand-400 dark:hover:bg-brand-950/30 rounded-lg transition-colors shadow-sm disabled:opacity-50 min-w-[70px]"
           >
             {loading ? <><Loader2 className="h-3 w-3 animate-spin mr-1.5" /> Saving...</> : "Save"}
           </button>
@@ -670,7 +670,7 @@ export default function EventIntakeForm({ onSuccess, initialClientId, eventId }:
             type="button"
             onClick={() => handleSubmit(true)}
             disabled={loading}
-            className="inline-flex items-center justify-center px-4 py-2 text-xs font-semibold text-white bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-700 rounded-lg transition-colors shadow-sm disabled:opacity-50 min-w-[110px]"
+            className="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-2 text-xs font-semibold text-white bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-700 rounded-lg transition-colors shadow-sm disabled:opacity-50 min-w-[110px]"
           >
             {loading ? <><Loader2 className="h-3 w-3 animate-spin mr-1.5" /> Ingesting...</> : "Save & Close"}
           </button>
