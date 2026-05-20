@@ -103,6 +103,11 @@ AI agents must respect the human developer's code notes. The AI **must strictly 
 ### Ⅴ. Zero-Build-Regression Guarantee
 Every code update must maintain absolute compile safety. After making any modification, the AI must immediately trigger a build check (`npx next build --webpack`) to verify that the changes introduce zero TypeScript compilation errors or linter breaks.
 
+### Ⅵ. Anti-Loop Protocol (Infinite Loop Prevention)
+All AIs must be highly vigilant against infinite AI-to-AI execution loops. 
+- **Hard Rule**: Never build automated triggers that continuously feed into each other (e.g., AG edits code -> CLI automatically audits and fails -> AG automatically tries to fix -> CLI automatically audits).
+- **Circuit Breaker**: The Swarm Handshake must remain strictly unidirectional. If the CLI finds an error during an automated audit, it logs the error to `CLI_Audit.md` and **immediately stops**. It must never attempt to fix the code itself, and AG must never automatically read `CLI_Audit.md` without the human CTO explicitly commanding it to do so. This guarantees human-in-the-loop oversight and prevents runaway automated billing or token exhaustion.
+
 ---
 
 ## 📖 6. Master Reference Blueprints

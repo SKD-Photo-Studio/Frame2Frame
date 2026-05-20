@@ -34,7 +34,7 @@ export default function AddEventButton({ initialClientId }: { initialClientId?: 
         <Plus className="h-4 w-4" />
         New Event
       </button>
-      <Modal open={open} onClose={() => setOpen(false)} title="Create New Event">
+      <Modal open={open} onClose={() => setOpen(false)} title="Create New Event" size="3xl">
         <EventIntakeForm onSuccess={() => setOpen(false)} initialClientId={initialClientId} />
       </Modal>
     </>

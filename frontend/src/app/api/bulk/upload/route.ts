@@ -109,6 +109,27 @@ export const POST = withApiWrapper<any>(async (tenantId, request) => {
     parsedOutputs = res.data || [];
   }
 
+  // Clean up existing event child tables (payments, crew, deliverables) on update to allow fresh recreation
+  if (parsedEvents.length > 0) {
+    for (const ev of parsedEvents) {
+      const displayId = ev["Display ID"];
+      if (displayId) {
+        const { data: existingEvent } = await supabaseAdmin
+          .from("events_master")
+          .select("id")
+          .eq("display_id", displayId)
+          .eq("tenant_id", tenantId)
+          .maybeSingle();
+
+        if (existingEvent) {
+          await supabaseAdmin.from("client_payments").delete().eq("event_id", existingEvent.id).eq("tenant_id", tenantId);
+          await supabaseAdmin.from("artist_expenses").delete().eq("event_id", existingEvent.id).eq("tenant_id", tenantId);
+          await supabaseAdmin.from("output_expenses").delete().eq("event_id", existingEvent.id).eq("tenant_id", tenantId);
+        }
+      }
+    }
+  }
+
   // 2. Atomic Database Transaction via RPC
   const { data: stats, error } = await supabaseAdmin.rpc("bulk_import_data", {
     p_tenant_id: tenantId,

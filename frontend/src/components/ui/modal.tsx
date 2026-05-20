@@ -9,11 +9,15 @@ export default function Modal({
   onClose,
   title,
   children,
+  size = "lg",
+  className,
 }: {
   open: boolean;
   onClose: () => void;
   title: string;
   children: React.ReactNode;
+  size?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl" | "5xl" | "6xl" | "7xl";
+  className?: string;
 }) {
   const [mounted, setMounted] = useState(false);
   const overlayRef = useRef<HTMLDivElement>(null);
@@ -44,6 +48,19 @@ export default function Modal({
 
   if (!open || !mounted) return null;
 
+  const sizeClasses = {
+    sm: "max-w-sm",
+    md: "max-w-md",
+    lg: "max-w-lg",
+    xl: "max-w-xl",
+    "2xl": "max-w-2xl",
+    "3xl": "max-w-3xl",
+    "4xl": "max-w-4xl",
+    "5xl": "max-w-5xl",
+    "6xl": "max-w-6xl",
+    "7xl": "max-w-7xl",
+  };
+
   const modalContent = (
     <div className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto py-8 px-4">
       <div
@@ -51,7 +68,7 @@ export default function Modal({
         className="fixed inset-0 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="relative z-10 w-full max-w-lg rounded-2xl bg-white dark:bg-[#1a1a1a] shadow-2xl ring-1 ring-black/5 dark:ring-white/10">
+      <div className={`relative z-10 w-full ${sizeClasses[size] || "max-w-lg"} ${className || ""} rounded-2xl bg-white dark:bg-[#1a1a1a] shadow-2xl ring-1 ring-black/5 dark:ring-white/10`}>
         <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 px-6 py-4">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{title}</h2>
           <button

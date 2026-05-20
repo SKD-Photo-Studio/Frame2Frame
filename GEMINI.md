@@ -27,6 +27,12 @@
 - **Primary Model**: **Gemini 3 Flash** (Fast/Efficient).
 - **Escalation**: Only use **Gemini 2.5 Pro** for heavy reasoning; explain the rationale and ask for user permission first.
 - **Workspace Root**: Use `frontend/` as the primary directory for code queries.
+- **Verification Rigor**: The CLI must NEVER assume that code changes provided by AntiGravity are correct or complete. For every database-related change (RPC, Migrations, Repository calls), the CLI MUST:
+  1. Cross-reference code parameters against the actual `.sql` definitions in `scratch/` or migrations.
+  2. Verify that `tenant_id` isolation is preserved and never bypassed unless explicitly documented.
+  3. Validate that "fixes" for cache/connectivity issues (like PostgREST errors) do not degrade security or data integrity.
+- **Audit Archiving Protocol**: The Gemini CLI is the sole editor of `Local Docs/CLI_Audit.md`. Once AntiGravity (AG) reviews the audit and implementation is complete, **AG is responsible for moving the content from CLI_Audit.md to CLI_Audit_Archive.md**, ensuring CLI_Audit.md is clean for the next task.
+- **Audit Archiving Protocol**: The Gemini CLI is the sole editor of `Local Docs/CLI_Audit.md`. Once AntiGravity (AG) reviews the audit and implementation is complete, **AG is responsible for moving the content from CLI_Audit.md to CLI_Audit_Archive.md**, ensuring CLI_Audit.md is clean for the next task.
 - **Pause Protocol**: When the user says "pause" or "pause session", immediately stop the current task, persist all current research findings, audit statuses, and mission progress strictly to `Local Docs/MEMORY.md`, say goodbye, and then terminate the session.
 - **AI Operational Rules**: All AI agents (IDE, CLI, Background Builders) MUST strictly read and adhere to the security, architecture, and human-first communication directives outlined in [AI_HANDBOOK.md](file:///c:/SKD%20Photo%20Studio/SKD-Tech/Frame2Frame%20-%20SKD%20Photo%20Studio/Projects/SKD%20Photo%20Studio%20-%20Frame2Frame/AI_HANDBOOK.md).
 - **Security Boundary**: The CLI must **never** read, parse, or output `.env.local` or other security credential/key files. If verification is needed, it must ask the CTO first.
