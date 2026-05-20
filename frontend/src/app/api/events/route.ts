@@ -43,9 +43,9 @@ export const GET = withApiWrapper(async (tenantId, request) => {
     { data: allOutputExp },
     { data: allPayments },
   ] = await Promise.all([
-    supabaseAdmin.from("artist_expenses").select("event_id, total_amount, advance_paid, user_id").eq("is_active", true),
-    supabaseAdmin.from("output_expenses").select("event_id, total_amount, user_id").eq("is_active", true),
-    supabaseAdmin.from("client_payments").select("event_id, amount").eq("is_active", true),
+    supabaseAdmin.from("artist_expenses").select("event_id, total_amount, advance_paid, user_id").eq("tenant_id", tenantId).eq("is_active", true),
+    supabaseAdmin.from("output_expenses").select("event_id, total_amount, user_id").eq("tenant_id", tenantId).eq("is_active", true),
+    supabaseAdmin.from("client_payments").select("event_id, amount").eq("tenant_id", tenantId).eq("is_active", true),
   ]);
 
   // Pre-calculate aggregates using dictionaries for O(N) lookup instead of O(N^2)
