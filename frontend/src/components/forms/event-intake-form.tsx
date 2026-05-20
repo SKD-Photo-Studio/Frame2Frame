@@ -356,7 +356,7 @@ export default function EventIntakeForm({ onSuccess, initialClientId, eventId }:
               >
                 {isDone ? <CheckCircle2 className="h-4 w-4" /> : num}
               </div>
-              <span className={`text-[10px] mt-1.5 font-medium transition-colors ${
+              <span className={`hidden sm:inline-block text-[10px] mt-1.5 font-medium transition-colors ${
                 isActive 
                   ? "text-brand-600 dark:text-brand-400 font-bold" 
                   : "text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300"
@@ -704,7 +704,7 @@ const PhotographerCrewTable = React.memo(({
   const showPerDayCols = artists.some(a => a.payType === "Per Day");
 
   return (
-    <div className="border border-gray-200 dark:border-gray-800 rounded-xl overflow-x-auto min-h-[380px] max-h-[550px] overflow-y-auto pb-32">
+    <div className="-mx-4 sm:mx-0 border border-gray-200 dark:border-gray-800 rounded-none sm:rounded-xl overflow-x-auto min-h-[380px] max-h-[550px] overflow-y-auto pb-32">
       <table className="w-full text-xs text-left border-collapse min-w-max">
         <thead className="bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 text-[10px] uppercase font-bold text-gray-400">
           <tr>
@@ -846,8 +846,8 @@ const DeliverablesTable = React.memo(({
   setDeliverables: React.Dispatch<React.SetStateAction<Deliverable[]>>;
 }) => {
   return (
-    <div className="border border-gray-200 dark:border-gray-800 rounded-xl overflow-x-auto min-h-[300px] max-h-[500px] overflow-y-auto pb-20">
-      <table className="w-full text-xs text-left border-collapse">
+    <div className="-mx-4 sm:mx-0 border border-gray-200 dark:border-gray-800 rounded-none sm:rounded-xl overflow-x-auto min-h-[300px] max-h-[500px] overflow-y-auto pb-20">
+      <table className="w-full text-xs text-left border-collapse min-w-[650px]">
         <thead className="bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 text-[10px] uppercase font-bold text-gray-400">
           <tr>
             <th className="p-2.5">Deliverables/Output</th>
@@ -945,8 +945,8 @@ const PaymentsTable = React.memo(({
   setPayments: React.Dispatch<React.SetStateAction<Payment[]>>;
 }) => {
   return (
-    <div className="border border-gray-200 dark:border-gray-800 rounded-xl overflow-x-auto max-h-80 overflow-y-auto">
-      <table className="w-full text-xs text-left border-collapse">
+    <div className="-mx-4 sm:mx-0 border border-gray-200 dark:border-gray-800 rounded-none sm:rounded-xl overflow-x-auto max-h-80 overflow-y-auto">
+      <table className="w-full text-xs text-left border-collapse min-w-[600px]">
         <thead className="bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 text-[10px] uppercase font-bold text-gray-400">
           <tr>
             <th className="p-2.5">Type</th>
@@ -1005,7 +1005,7 @@ const PaymentsTable = React.memo(({
                   type="date"
                   value={p.date}
                   onChange={e => setPayments(prev => prev.map((pay, i) => i === idx ? { ...pay, date: e.target.value } : pay))}
-                  className="border border-gray-300 dark:border-gray-800 rounded-lg p-1.5 bg-white dark:bg-[#1a1a1a]"
+                  className="w-28 border border-gray-300 dark:border-gray-800 rounded-lg p-1.5 bg-white dark:bg-[#1a1a1a]"
                 />
               </td>
               <td className="p-2">

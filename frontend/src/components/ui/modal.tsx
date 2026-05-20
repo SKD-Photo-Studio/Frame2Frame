@@ -62,14 +62,14 @@ export default function Modal({
   };
 
   const modalContent = (
-    <div className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto py-8 px-4">
+    <div className="fixed inset-0 z-[100] flex items-end sm:items-start justify-center overflow-y-auto sm:py-8 sm:px-4">
       <div
         ref={overlayRef}
         className="fixed inset-0 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className={`relative z-10 w-full ${sizeClasses[size] || "max-w-lg"} ${className || ""} rounded-2xl bg-white dark:bg-[#1a1a1a] shadow-2xl ring-1 ring-black/5 dark:ring-white/10`}>
-        <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 px-6 py-4">
+      <div className={`relative z-10 w-full max-h-[92vh] sm:max-h-none flex flex-col ${sizeClasses[size] || "max-w-lg"} ${className || ""} rounded-t-2xl sm:rounded-2xl bg-white dark:bg-[#1a1a1a] shadow-2xl ring-1 ring-black/5 dark:ring-white/10`}>
+        <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 px-4 sm:px-6 py-3 sm:py-4 flex-shrink-0">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{title}</h2>
           <button
             onClick={onClose}
@@ -78,7 +78,7 @@ export default function Modal({
             <X className="h-5 w-5" />
           </button>
         </div>
-        <div className="px-6 py-5 text-gray-700 dark:text-gray-300">{children}</div>
+        <div className="px-4 sm:px-6 py-4 sm:py-5 text-gray-700 dark:text-gray-300 overflow-y-auto flex-1">{children}</div>
       </div>
     </div>
   );
